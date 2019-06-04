@@ -1,0 +1,193 @@
+package oneKeySer;
+
+import java.io.File;
+import java.util.List;
+import java.util.Set;
+
+import org.apache.commons.lang3.StringUtils;
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
+import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.ie.InternetExplorerDriver;
+
+
+public class OneKeySer {
+
+	
+	private static final Logger logger = LogManager.getLogger(OneKeySer.class);
+
+	public static void main(String[] args) {
+		
+		String basePath = "E:\\oneKey";
+		//String basePath=new File("").getAbsoluteFile().getPath();
+		String chromeDriverPath = basePath + "/driver/chromedriver.exe";
+		String ieDriverPath = basePath + "/driver/chromedriver.exe";
+		
+		String browser = Utils.getConfig("browser");
+		String defUrl = Utils.getConfig("defUrl");
+		String types = Utils.getConfig("types");
+		String jqCdn = Utils.getConfig("jqCdn");
+		String title = Utils.getConfig("title");
+		String collectInterval = Utils.getConfig("collectInterval");
+		
+		if(StringUtils.isEmpty(defUrl)){
+			defUrl = "127.0.0.1/start.html";
+		}
+		if(StringUtils.isEmpty(jqCdn)){
+			defUrl = "http://libs.baidu.com/jquery/2.1.1/jquery.min.js";
+		}
+		if(StringUtils.isEmpty(title)){
+			title = "oneKey";
+		}
+		int collectInt = 3000;
+		if(!StringUtils.isEmpty(collectInterval)){
+			try {
+				collectInt = Integer.valueOf(collectInterval);				
+			} catch (Exception e) {
+			}
+		}
+		//所有模块
+		String model = Utils.readTxtFile(basePath + "/model.js");
+		String getX = Utils.readTxtFile(basePath +  "/model/getX.js");
+		
+		logger.info("basePath:" + basePath + " " );
+		logger.info("model:" + model + " " );
+		logger.info("chromeDriverPath:" + chromeDriverPath + " " );
+		logger.info("ieDriverPath:" + ieDriverPath + " " );
+		logger.info("browser:" + browser + " " );
+		logger.info("defUrl:" + defUrl + " " );
+		logger.info("types:" + types + " " );
+		logger.info("jqCdn:" + jqCdn + " " );
+		logger.info("title:" + title + " " );
+		logger.info("collectInt:" + collectInt + " " );
+
+		String[] typeArr = types.split(",");
+		String[] jss = model.split(",");
+		String hlight = "";
+		String hlightWithJq = "";
+		String jqueryStr = "var script = document.createElement(\"script\");" + "script.type = \"text/javascript\";" 
+				+ "script.src = \"" + jqCdn + "\";" 
+				+ "document.getElementsByTagName(\"head\")[0].appendChild(script);";
+		
+		String hlightModel = Utils.readTxtFile(basePath + "/model/hlight.js");
+		logger.info("templete:" + hlightModel + " " );
+		for(int i=0;i<typeArr.length;i++){
+			hlight = hlight + hlightModel.replaceAll("HLTYPE", typeArr[i]);
+		}
+		logger.info("script:" + hlight + " ");
+		
+		for(int i=0;i<jss.length;i++){
+			File file = new File(basePath + "/model/" + jss[i]);
+			if(!file.exists()){
+				logger.warn("file:" + jss[i] + " not exists in model" );
+				continue;
+			}
+			hlight =hlight +  Utils.readTxtFile(basePath + "/model/" + jss[i]);
+			logger.info("file:" + jss[i] + " " );
+			logger.info("script:" + hlight + " ");
+		}
+		
+		//最终执行的js
+		hlight = getX + hlight;
+		hlightWithJq = jqueryStr + hlight;
+		logger.info("scripts no jq:" + hlight);
+		logger.info("scripts with jq:" + hlightWithJq);
+
+		WebDriver driver = null;
+		if(browser.equalsIgnoreCase("chrome")){
+			ChromeOptions options = new ChromeOptions();
+			options.addArguments("disable-infobars");
+			System.setProperty("webdriver.chrome.driver", chromeDriverPath);
+			driver = new ChromeDriver(options);
+		}else if(browser.equalsIgnoreCase("ie")){
+			System.setProperty("webdriver.ie.driver", ieDriverPath);
+			driver = new InternetExplorerDriver(); 	
+		}else if(browser.equalsIgnoreCase("firefox")){
+			driver = new FirefoxDriver();
+		}else{
+			logger.error("browser type error:" + "ie,chrome or firefox");
+			return;
+		}
+		
+		driver.get(defUrl);
+		
+		JavascriptExecutor js = (JavascriptExecutor)driver;
+		Set<String> handles = driver.getWindowHandles();
+		for (String s : handles) {
+			if(driver.getTitle().contains(title)){
+				driver.switchTo().window(s);
+				break;
+			}
+		}
+		
+		int iiframesNum = 0;
+		List<WebElement> iiframes = null;
+		while (true) {
+			logger.info("sleep " + collectInt + "...");
+			try {
+				Thread.sleep(collectInt);
+				driver.switchTo().defaultContent();
+				driver.switchTo().frame("mainPage");
+				
+				try {
+					js.executeScript(hlight);
+				} catch (org.openqa.selenium.WebDriverException e) {
+					js.executeScript(hlightWithJq);
+				}
+			
+				driver.switchTo().defaultContent();
+				driver.switchTo().frame("mainPage");
+			
+				iiframes = driver.findElements(By.tagName("iframe"));
+				if ( iiframes.size() != 0 && iiframesNum != iiframes.size()) {
+					logger.info("find frames ...");
+					for (int j = 0; j < iiframes.size(); j++) {
+						driver.switchTo().defaultContent();
+						driver.switchTo().frame("mainPage");
+						logger.info("切换至ii frame " + (j + 1));
+						driver.switchTo().frame(j);
+						try {
+							js.executeScript(hlight);
+						} catch (org.openqa.selenium.WebDriverException e) {
+							js.executeScript(hlightWithJq);
+						}
+					}
+				}else{
+					logger.info("not find frames ...");
+					try {
+						js.executeScript(hlight);
+					} catch (org.openqa.selenium.WebDriverException e) {
+						js.executeScript(hlightWithJq);
+					}
+				}
+			} catch (Exception e) {
+				logger.error("error " + e);
+				//e.printStackTrace();
+				//driver.quit();
+				//driver.close();
+			}finally {
+				if(iiframes == null){
+					iiframesNum = 0;
+				}else{
+					iiframesNum = iiframes.size();
+				}
+			}
+		}
+	}
+	
+
+	
+	
+	
+	
+
+	
+	
+	
+}

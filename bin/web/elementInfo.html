@@ -1,0 +1,796 @@
+<html>
+<head>
+	<meta charset="UTF-8">
+    <meta http-equiv="content-type" content="text/html;charset=utf-8">
+	<script src="common/jquery.js" type="text/javascript"></script>	
+	<link rel="stylesheet" type="text/css" href="common/jquery-easyui-1.7.0/themes/default/easyui.css">
+	<link rel="stylesheet" type="text/css" href="common/jquery-easyui-1.7.0/themes/icon.css">
+	<script type="text/javascript" src="common/jquery-easyui-1.7.0/jquery.min.js"></script>
+	<script type="text/javascript" src="common/jquery-easyui-1.7.0/jquery.easyui.min.js"></script>
+	<script type="text/javascript" src="common/jquery-easyui-1.7.0/datagrid-export/datagrid-export.js"></script>
+</head>
+<body>
+
+<div>
+<table width="90%">
+		<tr>
+			<td>page:</td>	
+			<td><input class="easyui-textbox" type="text" id="currElementPage"  style="width:90%"  /> </td><td></td></tr>
+		<tr>
+			<td>alias:</td>	
+			<td><input class="easyui-textbox" type="text" id="currElementAlias"  style="width:90%"  /></td><td></td></tr>
+		<tr>
+			<td>id:</td>	
+			<td><input class="easyui-textbox" type="text" id="currElementId"  style="width:90%"  /></td><td></td></tr>
+		<tr>
+			<td>name:</td>	
+			<td><input class="easyui-textbox" type="text" id="currElementName" style="width:90%"  /></td>
+			<td>
+				<a href="javascript:void(0)" id="panelSwt" class="easyui-linkbutton" data-options="iconCls:'icon-tip',plain:true" onclick="openCloseP()"></a>
+			</td>
+		</tr>
+</table>
+<div>
+
+<div id="p" class="easyui-panel" style="width:95%;"data-options="border:false">
+	<table width="85%">
+			<tr><td>tag:</td><td><input class="easyui-textbox" type="text" id="currElementTagName"  style="width:96%"  /></td><td></td></tr>
+			<tr><td>text:</td>	<td><input class="easyui-textbox" type="text" id="currElementText"  style="width:96%"  /></td><td></td></tr>
+			<tr><td>value:</td>	<td><input class="easyui-textbox" type="text" id="currElementValue"  style="width:96%"  /></td><td></td></tr>
+			<tr><td>class:</td>	<td><input class="easyui-textbox" type="text" id="currElementClass"  style="width:96%"  /></td><td></td></tr>
+			<tr><td>href:</td>	<td><input class="easyui-textbox" type="text" id="currElementHref"  style="width:96%"  /></td><td></td></tr>
+	</table>
+</div>
+
+
+<form id='chooseXpath'>
+	<table width="95%">
+			<tr>
+				<td>frame:</td>	<td><input class="easyui-textbox" type="text" id="currElementframes"  style="width:100%" /></td><td></td></tr>
+			<tr>
+				<td>1xpath:</td>	
+				<td><input class="easyui-textbox" id="currElementXpath1"  style="width:100%"  /></td>
+				<td><input class="easyui-radiobutton" name="xp" value="1" label="">
+	<!-- 			<a href="javascript:void(0)" id="copy1" class="easyui-linkbutton" data-options="iconCls:'icon-ok',plain:true" onclick="copy('1')"></a>
+	 -->		</td>
+			</tr>
+			<tr>
+				<td>2xpath:</td>	
+				<td><input class="easyui-textbox" id="currElementXpath2"  style="width:100%" /></td>
+				<td><input class="easyui-radiobutton" name="xp" value="2" label="">
+	<!--  			<a href="javascript:void(0)" id="copy2" class="easyui-linkbutton" data-options="iconCls:'icon-ok',plain:true" onclick="copy('2')"></a>
+	 -->		</td>
+			</tr>
+			<tr>
+				<td>3xpath:</td>
+				<td><input class="easyui-textbox" id="currElementXpath3"  style="width:100%"></td>
+				<td><input class="easyui-radiobutton" name="xp" value="3" label="">
+	<!--  			<a href="javascript:void(0)" id="copy3" class="easyui-linkbutton" data-options="iconCls:'icon-ok',plain:true" onclick="copy('3')"></a>
+	 -->	
+				</td> 
+			</tr>
+	</table>
+</form>
+
+<a href="javascript:void(0)" id="append" class="easyui-linkbutton" data-options="iconCls:'icon-add',plain:true" onclick="append()"></a>
+<a href="javascript:void(0)" id="removeit" class="easyui-linkbutton" data-options="iconCls:'icon-remove',plain:true" onclick="removeit('dg')"></a>
+<a href="javascript:void(0)" id="accept" class="easyui-linkbutton" data-options="iconCls:'icon-save',plain:true" onclick="accept('dg')"></a>
+<a href="javascript:;" id="exportToExcel" class="easyui-linkbutton" data-options="iconCls:'icon-redo',plain:true" onclick="exportToExcel('dg')"></a>
+<a href="javascript:void(0)" id="refreshGd" class="easyui-linkbutton" data-options="iconCls:'icon-reload',plain:true" onclick="refreshGrid('dg')"></a>
+<a href="javascript:;" id="oneKey" class="easyui-linkbutton" data-options="iconCls:'icon-sum',plain:true" onclick="oneKey()"></a>
+
+
+<table id="dg" class="easyui-datagrid" title="Element List" 
+			data-options="singleSelect: true,url: 'data/demodata.json',method: 'get',rownumbers:true,
+				onDblClickRow: onDblClickRow,
+				onClickRow:onClickRow">
+		<thead>
+			<tr>
+				<th data-options="field:'elementPage',align:'center',sortable:true,resizable:false,editor:'text'" width="20%">page</th>
+				<th data-options="field:'elementAlias',align:'center',resizable:false,editor:'text'" width="20%">alias</th>
+				<th data-options="field:'typeid',sortable:true,width:50,
+						formatter:function(value,row){
+							return row.typename;
+						},
+						editor:{
+							type:'combobox',
+							options:{
+								valueField:'typeid',
+								textField:'typename',
+								method:'get',
+								url:'data/types.json',
+								required:true
+							}
+						}"
+				>type</th> 
+				<th data-options="field:'elementxpath',align:'center',resizable:false,editor:'text'" width="25%">xpath</th>
+				<th data-options="field:'elementframes',align:'center',resizable:false,editor:'text'" width="20%">frame</th>
+			</tr>
+		</thead>
+</table>
+ 
+<div id="tb2">
+		<a href="javascript:void(0)" id="generateB" class="easyui-linkbutton" data-options="iconCls:'icon-print',plain:true" onclick="generate()"></a>
+		<a href="javascript:void(0)" id="removeitB" class="easyui-linkbutton" data-options="iconCls:'icon-remove',plain:true" onclick="removeit('elementInfoList')"></a>
+		<a href="javascript:void(0)" id="exportToExcelB" class="easyui-linkbutton" data-options="iconCls:'icon-redo',plain:true" onclick="exportToExcel('elementInfoList')"></a>
+		<a href="javascript:void(0)" id="acceptB" class="easyui-linkbutton" data-options="iconCls:'icon-save',plain:true" onclick="accept('elementInfoList')"></a>
+		<a href="javascript:void(0)" id="refreshDgB" class="easyui-linkbutton" data-options="iconCls:'icon-reload',plain:true" onclick="refreshGrid('elementInfoList')"></a>
+</div>
+
+<div id="xpathsWindos" class="easyui-dialog" data-options="minimizable:true,maximizable:true,collapsible:true,required:true,buttons:'#choosebb'"
+		style="width: 50%; height: 40%; padding: 0px 0px; margin: 0px;" closed="true">
+	<table id="xpathList" class="easyui-datagrid" style="width:100%;height:100%" 
+		data-options="singleSelect:true,collapsible:true,method:'get',rownumbers:true,
+			onDblClickCell: onDblClickCellRetrunData">
+		<thead>
+			<tr>
+				<th data-options="field:'xpathK',align:'center',hidden:true,resizable:false,editor:'text'" width="10%">id</th>
+				<th data-options="field:'xpathV',align:'center',resizable:false,editor:'text'" width="90%">xpath</th>
+				<th data-options="field:'option',align:'center',resizable:false,formatter: function(value,row,index){
+						return '<a onclick=updateXpath(' + index + ')>U</a>';
+				}">option</th>
+			</tr>
+		</thead>
+	</table>
+</div> 
+<div id="choosebb">		
+	<a href="#" class="easyui-linkbutton" data-options="iconCls:'icon-print',plain:true" onclick="returnX()" >Return</a>
+	<a href="#" class="easyui-linkbutton" data-options="iconCls:'icon-back',plain:true" onclick="closeDialog('xpathsWindos')" >Close</a>
+</div>
+
+<div id="oneKeyWindow" class="easyui-dialog" data-options="minimizable:true,maximizable:true,collapsible:true,required:true,toolbar:'#tb2',buttons:'#bb'" style="width: 80%; height: 80%; padding: 0px 0px; margin: 0px;" closed="true">
+	<div style="margin:5px 0"></div>
+	<!--<form id="chooseTypesForm">
+	 &nbsp;&nbsp;<input class="easyui-checkbox" name="elementTypes" value="input" label="input:" /> &nbsp;&nbsp;
+		<input class="easyui-checkbox" name="elementTypes" value="button" label="button:" />&nbsp;&nbsp;
+		<input class="easyui-checkbox" name="elementTypes" value="a" label="a:" />&nbsp;&nbsp;
+		<input class="easyui-checkbox" name="elementTypes" value="table" label="table:" />&nbsp;&nbsp;
+		<input class="easyui-checkbox" name="elementTypes" value="tr" label="tr:" />&nbsp;&nbsp;
+		<input class="easyui-checkbox" name="elementTypes" value="td" label="td:" />&nbsp;&nbsp;
+	</form>	-->
+	&nbsp;&nbsp;<input class="easyui-combobox" name="language" id='elementTypes' style="width:75%;" label="请选择:" data-options="
+					url:'data/tags.json',
+					method:'get',
+					valueField:'tagname',
+					textField:'tagname',
+					multiple:true,
+					panelHeight:'auto'">
+	<a href="#" class="easyui-linkbutton" id='generateElement' data-options="iconCls:'icon-print',plain:true" onclick="generate()" >Generate</a>
+				
+	<div style="margin:5px 0"></div>
+
+	<table id="elementInfoList" class="easyui-datagrid" style="width:100%;height:90%" 
+		data-options="singleSelect:true,collapsible:true,url:'data/demodata.json',method:'get',rownumbers:true,
+			//onDblClickRow: onClickRowB,
+			onDblClickCell: onDblClickCellB">
+		<thead>
+			<tr>
+				<th data-options="field:'elementPage',align:'center',sortable:true,resizable:false,editor:'text'" width="15%">page</th>
+				<th data-options="field:'elementAlias',align:'center',resizable:false,editor:'text'" width="15%">alias</th>
+				<th data-options="field:'typeid',sortable:true,width:80,
+							formatter:function(value,row){
+								return row.typename;
+							},
+							editor:{
+								type:'combobox',
+								options:{
+									valueField:'typeid',
+									textField:'typename',
+									method:'get',
+									url:'data/types.json',
+									required:true
+									
+								}
+							}"
+				>type</th>
+				<th data-options="field:'xpathEquals',align:'center',hidden:true,resizable:false,editor:'text'" width="10%">xpathEquals</th>
+				<th data-options="field:'firstXpath',align:'center',hidden:true,resizable:false,editor:'text'" width="10%">firstXpath</th>
+				<th data-options="field:'xpathContains',align:'center',hidden:true,resizable:false,editor:'text'" width="10%">xpathContains</th>				
+				<th data-options="field:'elementxpath',align:'center',sortable:true,width:300,resizable:false">xpaths</th>
+
+				<!--<th data-options="field:'elementxpath',sortable:true,width:300,
+							formatter:function(value,row){
+								return row.xpathEquals;
+							},
+							editor:{
+								type:'combobox',
+								options:{
+									valueField:'xpathK',
+									textField:'xpathV',
+									required:true
+								}
+							}"
+				>xpath</th> -->
+			
+				<th data-options="field:'elementframes',align:'center',resizable:false,editor:'text'" width="10%">frame</th>
+				<th data-options="field:'id',align:'center',resizable:false" width="10%">id</th>
+				<th data-options="field:'name',align:'center',resizable:false" width="10%">name</th>
+				<th data-options="field:'tag',align:'center',resizable:false" width="10%">tag</th>
+				<th data-options="field:'class',align:'center',resizable:false" width="10%">class</th>
+				<th data-options="field:'href',align:'center',resizable:false" width="10%">href</th>
+				<th data-options="field:'src',align:'center',resizable:false" width="10%">src</th>
+			</tr>
+		</thead>
+	</table>
+</div>
+
+<div id="bb">
+	<a href="#" class="easyui-linkbutton" data-options="iconCls:'icon-redo',plain:true" onclick="exportToExcel('elementInfoList')" >Export</a>
+	<a href="#" class="easyui-linkbutton" data-options="iconCls:'icon-back',plain:true" onclick="closeDialog('oneKeyWindow')" >Close</a>
+</div>
+
+<script type="text/javascript">
+
+	$('#panelSwt').tooltip({
+				position: 'right',
+				content: '<span style="color:#fff">open or close element detail list.</span>',
+				onShow: function(){
+					$(this).tooltip('tip').css({
+						backgroundColor: '#666',
+						borderColor: '#666'
+					});
+				}
+	});
+
+	$('#append').tooltip({
+				position: 'right',
+				content: '<span style="color:#fff">add element info to list.</span>',
+				onShow: function(){
+					$(this).tooltip('tip').css({
+						backgroundColor: '#666',
+						borderColor: '#666'
+					});
+				}
+	});
+	$('#removeit').tooltip({
+				position: 'right',
+				content: '<span style="color:#fff">delete element info from list.</span>',
+				onShow: function(){
+					$(this).tooltip('tip').css({
+						backgroundColor: '#666',
+						borderColor: '#666'
+					});
+				}
+	});
+	$('#accept').tooltip({
+				position: 'right',
+				content: '<span style="color:#fff">save element info to list.</span>',
+				onShow: function(){
+					$(this).tooltip('tip').css({
+						backgroundColor: '#666',
+						borderColor: '#666'
+					});
+				}
+	});
+	$('#exportToExcel').tooltip({
+				position: 'right',
+				content: '<span style="color:#fff">export elements info to export.</span>',
+				onShow: function(){
+					$(this).tooltip('tip').css({
+						backgroundColor: '#666',
+						borderColor: '#666'
+					});
+				}
+	});
+	$('#generate').tooltip({
+				position: 'right',
+				content: '<span style="color:#fff">generate element info.</span>',
+				onShow: function(){
+					$(this).tooltip('tip').css({
+						backgroundColor: '#666',
+						borderColor: '#666'
+					});
+				}
+	});
+	
+	$('#refreshGd').tooltip({
+				position: 'right',
+				content: '<span style="color:#fff">clear element list grid.</span>',
+				onShow: function(){
+					$(this).tooltip('tip').css({
+						backgroundColor: '#666',
+						borderColor: '#666'
+					});
+				}
+	});
+	
+	$('#oneKey').tooltip({
+				position: 'right',
+				content: '<span style="color:#fff">open oneKey dialog.</span>',
+				onShow: function(){
+					$(this).tooltip('tip').css({
+						backgroundColor: '#666',
+						borderColor: '#666'
+					});
+				}
+	});
+	
+	$('#generateB').tooltip({
+				position: 'right',
+				content: '<span style="color:#fff">generate element info.</span>',
+				onShow: function(){
+					$(this).tooltip('tip').css({
+						backgroundColor: '#666',
+						borderColor: '#666'
+					});
+				}
+	});
+	$('#removeitB').tooltip({
+				position: 'right',
+				content: '<span style="color:#fff">delete element info from list.</span>',
+				onShow: function(){
+					$(this).tooltip('tip').css({
+						backgroundColor: '#666',
+						borderColor: '#666'
+					});
+				}
+	});
+	$('#acceptB').tooltip({
+				position: 'right',
+				content: '<span style="color:#fff">save element info to list.</span>',
+				onShow: function(){
+					$(this).tooltip('tip').css({
+						backgroundColor: '#666',
+						borderColor: '#666'
+					});
+				}
+	});
+	$('#exportToExcelB').tooltip({
+				position: 'right',
+				content: '<span style="color:#fff">export elements info to export.</span>',
+				onShow: function(){
+					$(this).tooltip('tip').css({
+						backgroundColor: '#666',
+						borderColor: '#666'
+					});
+				}
+	});
+	
+	$('#refreshDgB').tooltip({
+				position: 'right',
+				content: '<span style="color:#fff">clear element list grid.</span>',
+				onShow: function(){
+					$(this).tooltip('tip').css({
+						backgroundColor: '#666',
+						borderColor: '#666'
+					});
+				}
+	});
+	var edt = 'ok';
+	var edtl = 'ok';
+	var ps = 'open';
+	var editIndex = undefined;
+	var editIndexB = undefined;
+	var f1,f2;
+	function endEditing(){
+		return true
+		/*if (editIndex == undefined){return true}
+		if ($('#dg').datagrid('validateRow', editIndex)){
+			var ed = $('#dg').datagrid('getEditor', {index:editIndex,field:'typeid'});
+			var typename = $(ed.target).combobox('getText');
+			$('#dg').datagrid('getRows')[editIndex]['typename'] = typename;
+			$('#dg').datagrid('endEdit', editIndex);
+			editIndex = undefined;
+			return true;
+		} else {
+			return false;
+		}*/
+	}
+		
+	function endEditingB(){
+		return true
+		/*if (editIndexB == undefined){return true}
+		if ($('#elementInfoList').datagrid('validateRow', editIndexB)){
+			var ed = $('#elementInfoList').datagrid('getEditor', {index:editIndexB,field:'typeid'});
+			var typename = $(ed.target).combobox('getText');
+			//alert(typename);
+			$('#elementInfoList').datagrid('getRows')[editIndexB]['typename'] = typename;
+			$('#elementInfoList').datagrid('endEdit', editIndexB);
+			editIndexB = undefined;
+			return true;
+		} else {
+			return false;
+		}*/
+	}
+		
+	function onClickRow(index){
+		editIndex = index;
+	}
+		
+	function onDblClickRow(index){
+		 f1 = 'ok';
+		//if (editIndex != index){
+			if (endEditing('dg')){
+				$('#dg').datagrid('selectRow', index)
+						.datagrid('beginEdit', index);
+				editIndex = index;
+			} else {
+				$('#dg').datagrid('selectRow', editIndex);
+			}
+		//}
+	}
+		
+	function onClickRowB(index){
+		 f2 = 'ok';
+		 edtl = 'edt';
+		//if (editIndexB != index){
+			if (endEditingB('elementInfoList')){
+				$('#elementInfoList').datagrid('selectRow', index)
+									.datagrid('beginEdit', index);
+				editIndexB = index;
+			} else {
+				$('#elementInfoList').datagrid('selectRow', editIndexB);
+			}
+		//}
+	}
+		
+		
+	function append(){
+		if (endEditing()){
+			var elementNum = $('#dg').datagrid('getRows').length + 1;
+			var elementPage = $('#currElementPage').val();
+			var elementAlias = $('#currElementAlias').val();
+			var elementframes = $('#currElementframes').val();
+			var elementtag = $('#currElementTagName').val();
+				
+			if(elementPage == ''){
+				$.messager.alert("提示消息", "page不能为空！", 'info');
+				return false;
+			}
+			if(elementAlias == ''){
+				$.messager.alert("提示消息", "alias不能为空！", 'info');
+				return false;
+			}
+			if(elementtag == 'INPUT'){
+				elementtag = '输入框';
+				typeid = 1;
+			}else if(elementtag == 'BUTTON'){
+				elementtag = '按钮';
+				typeid = 2;
+			}else if(elementtag == 'TABLE'){
+				elementtag = '表格';
+				typeid = 6;
+			}else{
+				elementtag = '按钮';
+				typeid = 2;
+			}
+								
+			if ($('input:radio[name="xp"]:checked').val() == null){
+				$.messager.alert("提示消息", "请选择xpath", 'info');
+				return false;
+			}else{
+				 idx = $('input:radio[name="xp"]:checked').attr('value');
+				 elementxpath = $('#currElementXpath' + idx).val();
+				 if(elementxpath == ''){
+					$.messager.alert("提示消息", "选择的xpath为空，请重新选择", 'info');
+					return false;
+				 }
+			}
+			$('#dg').datagrid('appendRow',{elementNum:elementNum,elementPage:elementPage,elementAlias:elementAlias,elementxpath:elementxpath,elementframes:elementframes,typeid:typeid});
+			editIndex = $('#dg').datagrid('getRows').length-1;
+			$('#dg').datagrid('selectRow', editIndex)
+					.datagrid('beginEdit', editIndex);
+						
+			f1 = 'ok'
+		}
+	}
+	function removeit(dgId){
+		var selectRows = $('#' + dgId).datagrid('getSelections');
+		if(selectRows.length == 0){ 
+				$.messager.alert("提示消息", "请选择要删除的记录！", 'info');
+				return false;
+		}
+			
+		if(dgId == 'dg'){
+			$.messager.confirm("确认消息", "确定要删除所选记录吗？", function (isContinue) {
+				if (isContinue) {
+					$('#' + dgId).datagrid('deleteRow', editIndex);
+					$.messager.alert('提示', '删除成功！');
+					editIndex = undefined;
+				}
+			});
+		}else{
+			var drow = $("#" + dgId).datagrid('getSelected');
+			var index = $("#" + dgId).datagrid('getRowIndex', drow)
+
+			$.messager.confirm("确认消息", "确定要删除所选记录吗？", function (isContinue) {
+				if (isContinue) {
+					for(var i=0;i<selectRows.length;i++){
+						var index = $("#" + dgId).datagrid('getRowIndex', selectRows[i]);
+						$('#' + dgId).datagrid('deleteRow', index);
+					}
+					$.messager.alert('提示', '删除成功！');
+					editIndex = undefined;
+				}
+			});
+		}
+	}
+	function accept(dgId){
+		var data=$('#' + dgId).datagrid('getData');
+		if(data.total == 0){
+			$.messager.alert("提示消息", "未查询到相关记录，不能保存！", 'info');
+			return false;
+		}
+		if((f1 != 'ok' && dgId == 'dg') || (f2 != 'ok' && dgId == 'elementInfoList')){
+			$.messager.alert("提示消息", "暂未修改，不能保存！", 'info');
+			return false;
+		}
+			
+		$('#' + dgId).datagrid('acceptChanges');
+		$.messager.alert('提示', '保存成功！');
+		
+		if(dgId == 'dg'){
+			f1 = 'ok';
+		}
+		if(dgId == 'elementInfoList'){
+			f2 = 'ok';
+			edtl = 'ok';
+		}
+		
+	}
+	
+	function reject(dgId){
+		if(dgId == 'dg'){
+			$('#' + dgId).datagrid('rejectChanges');
+			editIndex = undefined;
+		}else{
+			$('#' + dgId).datagrid('rejectChanges');
+			editIndexB = undefined;
+		}
+	}
+		
+		
+	function exportToExcel(dgId){
+		var data=$('#' + dgId).datagrid('getData');
+		if(data.total == 0){
+			$.messager.alert("提示消息", "未查询到相关记录，不能导出！", 'info');
+			return false;
+		}
+		
+		$.messager.confirm("确认消息", "确定要导出所有记录吗？", function (isContinue) {
+				if (isContinue) {
+					var f = 'elementInfo.xls';
+					if(dgId != 'dg'){
+						f = 'ElementInfoList.xls';
+					}
+					$('#' + dgId).datagrid('toExcel',f);
+					$.messager.alert('提示', '导出完成！');
+				}
+		});
+	}
+		
+	function openCloseP(){
+		if(ps == 'open'){
+			ps = 'closed';
+			$('#p').panel('close');
+		}else{
+			ps = 'open';
+			$('#p').panel('open');
+		}
+		
+	}
+		
+	function oneKey(){
+		openDialog('oneKeyWindow','ADD ELEMENTS');
+	}
+		
+		
+	function openDialog(id, title) {
+		$('#' + id).dialog({
+			title : title,
+			iconCls:'icon-title',
+			cache : false,
+			modal : true,
+			constrain:true,
+			resizable:true,
+			onLoad : function(){
+			},
+			onOpen : function() {
+			},
+			onBeforeOpen: function() {
+				var formId = id.substr(4, id.length - 4);
+				if ($('#form' + formId)) {
+					$('#form' + formId).form('clear');
+				}
+			}
+		});
+			
+		var dlgWidth = $('#' + id).dialog('options').width;
+		var dlgHeight = $('#' + id).dialog('options').height;
+		var winWidth = 800;
+		var winHeight = 400;
+		var top =  $('#' + id).dialog('options').top;
+		var left =  $('#' + id).dialog('options').left;
+		if(dlgHeight >= winHeight){
+			$('#' + id).dialog('resize',{height:winHeight-100,top:20})
+		}
+		if(dlgWidth >= winWidth){
+			$('#' + id).dialog('resize',{width:winWidth-50,left:20})
+		}
+			
+		$('#' + id).dialog('open');
+		$('#' + id).parents('.panel').css('position','fixed');
+	}
+
+
+	function closeDialog(id) {
+		$('#'+id).dialog('close');
+	}
+		
+		
+	function copy(id){
+		  var text = $('#currElementXpath' + id).val();
+		  var input = document.getElementById("copytext");
+		  input.value = text; // 修改文本框的内容
+		  input.select(); // 选中文本
+		  document.execCommand("copy"); // 执行浏览器复制命令
+		  alert("复制成功");
+
+	}
+
+	function refreshGrid(dgId){
+		$("#" + dgId).datagrid("loadData", {total : 0, rows : []}); 
+	}
+
+	function generate(){
+	
+		if(edtl != 'ok'){
+			$.messager.alert("提示消息", "还未保存，请先保存", 'info');
+			return false;
+		}
+	
+		var types = "";
+		/*if ($('input:checkbox[name="elementTypes"]:checked').length == 0){
+			$.messager.alert("提示消息", "请选择元素类型！", 'info');
+			return false;
+		}else{
+			$("input[name='elementTypes']:checked").each(function(){
+				types = types + $(this).val()+ ";"
+			});
+			console.log("已选择的类型："+ types);
+		}*/
+		
+		types = $('#elementTypes').combobox('getValues');
+		if (types == ''){
+			$.messager.alert("提示消息", "请选择元素类型！", 'info');
+			return false;
+		}
+		console.log("已选择的类型："+ types);
+		$.messager.confirm("确认消息", "确定要进行此操作？", function (isContinue) {
+				if (isContinue) {
+					var data = {
+						act: 'getElementInfos',
+						msg: {
+							types:'input;button'
+							}
+					};
+					window.top.postMessage(data, '*');
+				}
+		});
+	}
+	
+	var indx = -1;
+	function onDblClickCellB(index,field,value){
+		indx = index;
+		if(String(field) == 'elementxpath'){
+			var xpathEquals = $('#elementInfoList').datagrid('getRows')[index]['xpathEquals'];
+			var firstXpath = $('#elementInfoList').datagrid('getRows')[index]['firstXpath'];
+			var xpathContains = $('#elementInfoList').datagrid('getRows')[index]['xpathContains'];
+			var xpaths = $('#elementInfoList').datagrid('getRows')[index]['xpaths'];
+
+			openDialog('xpathsWindos','Choose Xpath');
+			refreshGrid('xpathList');
+			
+			var xpathOptions=[];
+			var xpathO = {};
+			xpathO['xpathV'] = xpathEquals;
+			xpathO['xpathK'] = xpathEquals;
+			xpathOptions.push(xpathO);
+			xpathO = {};
+			xpathO['xpathV'] = firstXpath;
+			xpathO['xpathK'] = firstXpath;
+			xpathOptions.push(xpathO);
+			xpathO = {};
+			xpathO['xpathV'] = xpathContains;
+			xpathO['xpathK'] = xpathContains;
+			xpathOptions.push(xpathO);
+		
+			console.log(xpathOptions[0].xpathV);
+
+			$("#xpathList").datagrid("loadData", xpathOptions); 
+			
+		}else{
+			
+			onClickRowB(index);
+		}
+
+	}
+
+	function onDblClickCellRetrunData(index){
+		/*var chooseXpath = $('#xpathList').datagrid('getRows')[index]['xpathV'];
+		var listRowIndex=$('#elementInfoList').datagrid('getRowIndex',$('#elementInfoList').datagrid('getSelected'))
+		if(chooseXpath != null && indx != -1){
+			$('#elementInfoList').datagrid('updateRow',{index: indx,row: {elementxpath: chooseXpath}});
+		}
+		closeDialog('xpathsWindos');*/
+		var selectRows = $('#xpathList').datagrid('getSelections');
+		if(selectRows.length == 0){ 
+			$.messager.alert("提示消息", "请先选择一行xpath", 'info');
+			return false;
+		}
+		var xpathRowIndex=$('#xpathList').datagrid('getRowIndex',$('#xpathList').datagrid('getSelected'));
+		var listRowIndex=$('#elementInfoList').datagrid('getRowIndex',$('#elementInfoList').datagrid('getSelected'))
+		var chooseXpath = $('#xpathList').datagrid('getRows')[xpathRowIndex]['xpathV'];
+		if(chooseXpath == "" || chooseXpath == " " || chooseXpath == undefined){ 
+			$.messager.alert("提示消息", "选择的xpath不能为空", 'info');
+			return false;
+		}
+		
+		if(chooseXpath != null && indx != -1){
+			$('#elementInfoList').datagrid('updateRow',{index: listRowIndex,row: {elementxpath: chooseXpath}});
+		}
+		closeDialog('xpathsWindos');
+	}
+	
+	function returnX(){
+		onDblClickCellRetrunData(0);
+	}
+
+	
+	function updateXpath(index){
+		if(edt  == 'ok'){
+			$('#xpathList').datagrid('selectRow', index)
+			$('#xpathList').datagrid('beginEdit', index);
+			edt = 'no';
+		}else{
+			edt = 'ok';
+			//if(chooseXpath == '' || chooseXpath == ' ' || chooseXpath == undefined){
+			//	$.messager.alert("提示消息", "xpath不能为空", 'info');
+			//	return false;
+			//}
+			//var editors = $('#xpathList').datagrid('getEditors', index);                 
+            //var editor1 = editors[0];
+           // var editor2 = editors[1];
+
+			$('#xpathList').datagrid('acceptChanges');
+			//var ed = $('#xpathList').datagrid('getEditor', {index:index,field:'xpathV'});
+			//var chooseXpath = $(ed.editor1).textbox('getValue');
+			//var chooseXpath = $(ed.target).text('getValue');
+			//alert(chooseXpath[0]);
+			$.messager.alert('提示', '保存成功！');
+			
+		}
+	}
+	
+</script>
+
+<style>	
+	.tooltip-content {
+			font-size: 10px;
+	}
+	
+	.datagrid-header-row, .datagrid-row {
+		height: 25px;
+	}
+	
+	.textbox{
+		margin: 0px;
+		padding-top: 0px;
+		padding-bottom: 0px;
+		height: 24px;
+		line-height: 24px;
+		width: 196px;
+	}
+	.l-btn-icon {
+		display: inline-block;
+		width: 16px;
+		height: 16px;
+		line-height: 16px;
+		position: absolute;
+		top: 40%;
+		margin-top: -4px;
+		font-size: 1px;
+	}
+	
+	</style>
+</body>
