@@ -92,6 +92,7 @@ function getXbyNode(node) {
 	
 	try {
 		pageTitle = window.document.title;
+		console.log("pageTitle:" + pageTitle);
 		var isInIFrame = (window.location != window.parent.location);
 		if (isInIFrame == true) {
 			iFrameUrl = window.document.URL;
@@ -113,10 +114,12 @@ function getXbyNode(node) {
 					idOrNames = idOrNames + "/" + idOrName;
 				}
 			}
-			console.log("idOrNames:" + idOrNames);
+			//console.log("idOrNames:" + idOrNames);
 		}
 	} catch (err) {
+		console.log("-------------err:" + err);
 	}
+	
 	if (tagName != 'body') {
 		
 		for (var i = 0; i < node.attributes.length; i++) {
@@ -316,7 +319,8 @@ function getXbyNode(node) {
 		if (nodeText != '') {
 			elementNm = nodeText;
 		}
-
+		
+		/* * * 
 		console.log('id--------' + id);
 		console.log('name--------' + name);
 		console.log('tag--------' + tagName);
@@ -325,14 +329,18 @@ function getXbyNode(node) {
 		console.log('class--------' + value);
 		console.log('href--------' + href);
 		console.log('src--------' + src);
-		/*
-		 * console.log('threeStar--------'+ threeStar);
-		 * console.log('twoStar--------'+ twoStar);
-		 * console.log('oneStar--------'+ oneStar);
-		 * console.log('iFrameUrl--------'+ iFrameUrl);
-		 * console.log('isInIFrameFlag--------'+ isInIFrameFlag);
-		 * console.log('idOrNames--------'+ idOrNames);
-		 * console.log('pageTitle--------'+ pageTitle);
+		
+		console.log('threeStar--------'+ threeStar);
+		console.log('twoStar--------'+ twoStar);
+		console.log('oneStar--------'+ oneStar);
+		console.log('iFrameIdOrName--------'+ idOrNames);
+		console.log('elementNm--------'+ elementNm);
+		console.log('pageTitle--------'+ pageTitle);
+		console.log('idOrNames--------'+ idOrNames);
+		console.log('iFrameUrl--------'+ iFrameUrl);
+		console.log('isInIFrameFlag--------'+ isInIFrameFlag);
+		 console.log('idOrNames--------'+ idOrNames);
+		console.log('pageTitle--------'+ pageTitle);
 		 * console.log('xpathContainsArr--------'+ xpathContainsArr);
 		 * console.log('uniquesArr--------'+ uniquesArr);
 		 * console.log('name--------'+ name); console.log('value--------'+
@@ -364,9 +372,15 @@ function getXbyNode(node) {
 	 resInfo['xpathEquals'] = xpathEquals;
 	 resInfo['firstXpath'] = firstXpath;
 	 resInfo['xpathContains'] = xpathContains;
-	 resInfo['iFrameUrl'] = iFrameUrl;
+	 resInfo['threeStar'] = threeStar;
+	 resInfo['twoStar'] = twoStar;
+	 resInfo['oneStar'] = oneStar;
 	 resInfo['isInIFrameFlag'] = isInIFrameFlag;
+	 resInfo['iFrameIdOrName'] = idOrNames;
+	 resInfo['iFrameUrl'] = iFrameUrl;
+	 resInfo['pageTitle'] = pageTitle;
 
+	 
 	return resInfo;
 }
 
@@ -378,9 +392,9 @@ console.log('----------start get element xpath----------------------');
 
 $(document).ready(function(){ 
 	window.addEventListener('message', function(e){
-		console.log("-------------" +  e.data.act + "-------------");
+		//console.log("-------------" +  e.data.act + "-------------");
 		if (e.data.act == 'getElementInfo') {
-			var resultElementInfo ="test001";
+			var resultElementInfo ="";
 			var types = e.data.msg.types;
 			console.log("-------------" +  types + "-------------");
 			var resultElementInfo = getPageEles(types);
