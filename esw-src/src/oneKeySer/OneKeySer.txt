@@ -22,10 +22,14 @@ public class OneKeySer {
 	
 	private static final Logger logger = LogManager.getLogger(OneKeySer.class);
 
+	private static WebDriver driver;
+	
 	public static void main(String[] args) {
 		
-		String basePath = "E:\\oneKey";
-		//String basePath=new File("").getAbsoluteFile().getPath();
+		//String basePath = "E:\\oneKey";
+		String basePath=new File("").getAbsoluteFile().getPath();
+		//String basePath=new File("WebContent/WEB-INF").getAbsoluteFile().getPath();
+
 		String chromeDriverPath = basePath + "/driver/chromedriver.exe";
 		String ieDriverPath = basePath + "/driver/chromedriver.exe";
 		
@@ -76,11 +80,9 @@ public class OneKeySer {
 				+ "document.getElementsByTagName(\"head\")[0].appendChild(script);";
 		
 		String hlightModel = Utils.readTxtFile(basePath + "/model/hlight.js");
-		logger.info("templete:" + hlightModel + " " );
 		for(int i=0;i<typeArr.length;i++){
 			hlight = hlight + hlightModel.replaceAll("HLTYPE", typeArr[i]);
 		}
-		logger.info("script:" + hlight + " ");
 		
 		for(int i=0;i<jss.length;i++){
 			File file = new File(basePath + "/model/" + jss[i]);
@@ -90,7 +92,7 @@ public class OneKeySer {
 			}
 			hlight =hlight +  Utils.readTxtFile(basePath + "/model/" + jss[i]);
 			logger.info("file:" + jss[i] + " " );
-			logger.info("script:" + hlight + " ");
+			//logger.info("script:" + hlight + " ");
 		}
 		
 		//最终执行的js
@@ -99,7 +101,7 @@ public class OneKeySer {
 		logger.info("scripts no jq:" + hlight);
 		logger.info("scripts with jq:" + hlightWithJq);
 
-		WebDriver driver = null;
+		
 		if(browser.equalsIgnoreCase("chrome")){
 			ChromeOptions options = new ChromeOptions();
 			options.addArguments("disable-infobars");
@@ -117,7 +119,55 @@ public class OneKeySer {
 		
 		driver.get(defUrl);
 		
+		
 		JavascriptExecutor js = (JavascriptExecutor)driver;
+		switchWin(title);
+		int iiframesNum = 0;
+		List<WebElement> iiframes = null;
+		
+		while (true) {
+			try {
+				logger.info("sleep " + collectInt + "...");
+				Thread.sleep(collectInt);
+				//默认
+				driver.switchTo().defaultContent();
+				driver.switchTo().frame("mainPage");
+				js.executeScript(hlight);
+				//frame
+				iiframes = driver.findElements(By.tagName("iframe"));
+				logger.info("find frames ..." + iiframes.size() + ", iiframesNum: " + iiframesNum);
+				if (iiframes.size() != 0) {
+					if (iiframesNum == 0 &&  iiframesNum != iiframes.size()) {//first
+						for(int i=0;i<iiframes.size();i++){
+							logger.info("切换至 iframe " + (i + 1));
+							driver.switchTo().frame(i); 
+							js.executeScript(hlight);
+						}
+						iiframesNum = iiframes.size();
+					
+					}else if(iiframesNum != 0 &&  iiframesNum != iiframes.size() &&  iiframesNum < iiframes.size()){ //新打开
+						logger.info("切换至 iframe " + (iiframes.size() + 1));
+						driver.switchTo().frame((iiframes.size() - 1)); 
+						js.executeScript(hlight);
+						iiframesNum = iiframes.size();
+						
+					}else {
+						logger.info("over ...");
+					}
+
+				} /*else {
+					logger.info("not find frames ...");
+					js.executeScript(hlight);
+				}*/
+			} catch (Exception e) {
+				e.printStackTrace();
+			} finally {
+			}
+		}
+	}
+	
+
+	private static void switchWin(String title){
 		Set<String> handles = driver.getWindowHandles();
 		for (String s : handles) {
 			if(driver.getTitle().contains(title)){
@@ -126,63 +176,7 @@ public class OneKeySer {
 			}
 		}
 		
-		int iiframesNum = 0;
-		List<WebElement> iiframes = null;
-		while (true) {
-			logger.info("sleep " + collectInt + "...");
-			try {
-				Thread.sleep(collectInt);
-				driver.switchTo().defaultContent();
-				driver.switchTo().frame("mainPage");
-				
-				try {
-					js.executeScript(hlight);
-				} catch (org.openqa.selenium.WebDriverException e) {
-					js.executeScript(hlightWithJq);
-				}
-			
-				driver.switchTo().defaultContent();
-				driver.switchTo().frame("mainPage");
-			
-				iiframes = driver.findElements(By.tagName("iframe"));
-				if ( iiframes.size() != 0 && iiframesNum != iiframes.size()) {
-					logger.info("find frames ...");
-					for (int j = 0; j < iiframes.size(); j++) {
-						driver.switchTo().defaultContent();
-						driver.switchTo().frame("mainPage");
-						logger.info("切换至ii frame " + (j + 1));
-						driver.switchTo().frame(j);
-						try {
-							js.executeScript(hlight);
-						} catch (org.openqa.selenium.WebDriverException e) {
-							js.executeScript(hlightWithJq);
-						}
-					}
-				}else{
-					logger.info("not find frames ...");
-					try {
-						js.executeScript(hlight);
-					} catch (org.openqa.selenium.WebDriverException e) {
-						js.executeScript(hlightWithJq);
-					}
-				}
-			} catch (Exception e) {
-				logger.error("error " + e);
-				//e.printStackTrace();
-				//driver.quit();
-				//driver.close();
-			}finally {
-				if(iiframes == null){
-					iiframesNum = 0;
-				}else{
-					iiframesNum = iiframes.size();
-				}
-			}
-		}
 	}
-	
-
-	
 	
 	
 	
