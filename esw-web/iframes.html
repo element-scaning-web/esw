@@ -31,7 +31,7 @@ window.onload = function(){
 }
 
 window.addEventListener('message', function(e){
-	console.log("-------------" +  e.data.act + "-------------");
+	//console.log("-------------" +  e.data.act + "-------------");
 	if (e.data.act == 'getElementInfos') {
 		var types = e.data.msg.types;
 		var data = {
@@ -48,7 +48,7 @@ window.addEventListener('message', function(e){
 }, false);
 
 window.addEventListener('message', function(e){
-	console.log("-------------" +  e.data.act + "-------------");
+	//console.log("-------------" +  e.data.act + "-------------");
 	if (e.data.act == 'resultElementInfo') {
 		var result = e.data.msg.result;
 		console.log('result: '+ result);
@@ -62,9 +62,6 @@ window.addEventListener('message', function(e){
 			console.log(result[i].iFrameUrl);
 			console.log(result[i].isInIFrameFlag);
 			*/
-
-			
-			
 			for (var item in result[i]) {
 				console.log('key: ' + item + ',  value: ' + result[i][item]);				
 			}
@@ -80,19 +77,21 @@ window.addEventListener('message', function(e){
 
 
 window.addEventListener('message', function(e){
-	console.log("-------------" +  e.data.act + "-------------");
+	//console.log("-------------" +  e.data.act + "-------------");
 	if (e.data.act == 'elementInfo') {
 		console.log("-------------GET ELEMENT INFO-------------")
-		console.log("---title: "+ e.data.msg.title);
+		/*console.log("---title: "+ e.data.msg.title);
 		console.log("---id: "+ e.data.msg.id + ", name: " + e.data.msg.name + ", type: " + e.data.msg.type + ", class: " + e.data.msg.clss);
-		console.log("---href: "+ e.data.msg.href + ", value: " + e.data.msg.value + ", text: " + e.data.msg.txt);
+		console.log("---href: "+ e.data.msg.href + ", value: " + e.data.msg.value + ", text: " + e.data.msg.txt + ', frame:' + e.data.msg.framess);
 		console.log("---frames: " + e.data.msg.framess);
 		console.log("---xpath1: "+ e.data.msg.xpath1);
 		console.log("---xpath2: "+ e.data.msg.xpath2);
 		console.log("---xpath3: "+ e.data.msg.xpath3);
-		
-		$("#currElementPage").textbox('setValue',e.data.msg.title);
-		$("#currElementAlias").textbox('setValue',e.data.msg.title + "_Page");
+		console.log("---alias: "+ e.data.msg.alias);
+		*/
+
+		$("#currElementPage").textbox('setValue',e.data.msg.title + '_Page');
+		$("#currElementAlias").textbox('setValue',e.data.msg.alias);
 		$("#currElementId").textbox('setValue',e.data.msg.id);
 		$("#currElementName").textbox('setValue',e.data.msg.name);
 		$("#currElementTagName").textbox('setValue',e.data.msg.type);
@@ -126,7 +125,6 @@ window.addEventListener('message', function(e){
             act: 'response', 
             msg: {answer: '我接收到啦！'}
         }, '*');*/
-		console.log("")
     } //else {
 		//console.log('未定义的消息: '+ e.data.act);
     //}
@@ -144,7 +142,7 @@ window.addEventListener('message', function(e){
 		</div>-->
 		<!--<div id="mainPageId" name="mainPage" data-options="region:'center'" title="TEST PAGE" href="http://www.baidu.com"> -->
 		<div data-options="region:'center'" title="TEST PAGE" >
-			<iframe src="" style="width:100%;height:98%;" id="mainPageId" name="mainPage" noresize="noresize" marginwidth="0" marginheight="0" frameborder="0" target="_self"></iframe>
+			<iframe src="" style="width:100%;height:98%;" id="mainPageId" name="mainPage" noresize="noresize" marginwidth="0" marginheight="0" frameborder="0"></iframe>
 		</div>
 </div>
 
