@@ -1,6 +1,6 @@
 [
-{"typeid":"1","typename":"输入框"},
-{"typeid":"2","typename":"按钮"},
-{"typeid":"6","typename":"表格"},
-{"typeid":"7","typename":"下拉框"}
+{"tagid":"INPUT","tagname":"输入框"},
+{"tagid":"BUTTON","tagname":"按钮"},
+{"tagid":"TABLE","tagname":"表格"},
+{"tagid ":"SELECT","tagname":"下拉框"}
 ]

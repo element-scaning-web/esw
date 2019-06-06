@@ -87,15 +87,15 @@
 			<tr>
 				<th data-options="field:'elementPage',align:'center',sortable:true,resizable:false,editor:'text'" width="20%">page</th>
 				<th data-options="field:'elementAlias',align:'center',resizable:false,editor:'text'" width="20%">alias</th>
-				<th data-options="field:'typeid',sortable:true,width:50,
+				<th data-options="field:'tagid',sortable:true,width:50,
 						formatter:function(value,row){
-							return row.typename;
+							return row.tagname;
 						},
 						editor:{
 							type:'combobox',
 							options:{
-								valueField:'typeid',
-								textField:'typename',
+								valueField:'tagid',
+								textField:'tagname',
 								method:'get',
 								url:'data/types.json',
 								required:true
@@ -176,15 +176,15 @@
 			<tr>
 				<th data-options="field:'pageTitle',align:'center',sortable:true,resizable:false,editor:'text'" width="15%">page</th>
 				<th data-options="field:'elementNm',align:'center',resizable:false,editor:'text'" width="6%">alias</th>
-				<th data-options="field:'typeid',sortable:true,width:80,
+				<th data-options="field:'tagid',sortable:true,width:80,
 							formatter:function(value,row){
-								return row.typename;
+								return row.tagname;
 							},
 							editor:{
 								type:'combobox',
 								options:{
-									valueField:'typeid',
-									textField:'typename',
+									valueField:'tagid',
+									textField:'tagname',
 									method:'get',
 									url:'data/types.json',
 									required:true
@@ -198,7 +198,7 @@
 				<th data-options="field:'threeStar',align:'center',hidden:true,resizable:false,editor:'text'" width="10%">threeStar</th>
 				<th data-options="field:'twoStar',align:'center',hidden:true,resizable:false,editor:'text'" width="10%">twoStar</th>
 				<th data-options="field:'oneStar',align:'center',hidden:true,resizable:false,editor:'text'" width="10%">oneStar</th>				
-				<th data-options="field:'xpathEquals',align:'center',resizable:false" width="30%">xpath</th>
+				<th data-options="field:'xpathEquals',align:'center',sortable:true,resizable:false" width="30%">xpaths</th>
 
 				<!--<th data-options="field:'elementxpath',sortable:true,width:300,
 							formatter:function(value,row){
@@ -453,7 +453,7 @@
 				$.messager.alert("提示消息", "alias不能为空！", 'info');
 				return false;
 			}
-			if(elementtag == 'INPUT'){
+			/*if(elementtag == 'INPUT'){
 				elementtag = '输入框';
 				typeid = 1;
 			}else if(elementtag == 'BUTTON'){
@@ -465,7 +465,7 @@
 			}else{
 				elementtag = '按钮';
 				typeid = 2;
-			}
+			}*/
 								
 			if ($('input:radio[name="xp"]:checked').val() == null){
 				$.messager.alert("提示消息", "请选择xpath", 'info');
@@ -478,7 +478,7 @@
 					return false;
 				 }
 			}
-			$('#dg').datagrid('appendRow',{elementNum:elementNum,elementPage:elementPage,elementAlias:elementAlias,elementxpath:elementxpath,elementframes:elementframes,typeid:typeid});
+			$('#dg').datagrid('appendRow',{elementNum:elementNum,elementPage:elementPage,elementAlias:elementAlias,elementxpath:elementxpath,elementframes:elementframes,tagid:elementtag});
 			editIndex = $('#dg').datagrid('getRows').length-1;
 			$('#dg').datagrid('selectRow', editIndex)
 					.datagrid('beginEdit', editIndex);
@@ -503,7 +503,7 @@
 			});
 		}else{
 			var drow = $("#" + dgId).datagrid('getSelected');
-			var index = $("#" + dgId).datagrid('getRowIndex', drow)
+			var index = $("#" + dgId).datagrid('getRowIndex', drow);
 
 			$.messager.confirm("确认消息", "确定要删除所选记录吗？", function (isContinue) {
 				if (isContinue) {
@@ -527,6 +527,13 @@
 			$.messager.alert("提示消息", "暂未修改，不能保存！", 'info');
 			return false;
 		}
+			
+		var drow = $("#" + dgId).datagrid('getSelected');
+		var index = $("#" + dgId).datagrid('getRowIndex', drow);	
+		var ed = $('#' + dgId).datagrid('getEditor', {index:index,field:'tagid'});
+		var tagname = $(ed.target).combobox('getText');
+		$('#' + dgId).datagrid('getRows')[index]['tagname'] = tagname;
+		$('#' + dgId).datagrid('endEdit', index);	
 			
 		$('#' + dgId).datagrid('acceptChanges');
 		$.messager.alert('提示', '保存成功！');
