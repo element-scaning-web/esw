@@ -137,7 +137,7 @@ public class OneKeySer {
 				iiframes = driver.findElements(By.tagName("iframe"));
 				logger.info("find frames ..." + iiframes.size() + ", iiframesNum: " + iiframesNum);
 				if (iiframes.size() != 0) {
-					if (iiframesNum == 0 &&  iiframesNum != iiframes.size()) {//first
+					/*if (iiframesNum == 0 &&  iiframesNum != iiframes.size()) {//first
 						for(int i=0;i<iiframes.size();i++){
 							logger.info("切换至 iframe " + (i + 1));
 							driver.switchTo().frame(i); 
@@ -153,6 +153,16 @@ public class OneKeySer {
 						
 					}else {
 						logger.info("over ...");
+					}*/
+					
+					for(int i=0;i<iiframes.size();i++){
+						logger.info("切换至 iframe " + (i + 1));
+						driver.switchTo().defaultContent();
+						driver.switchTo().frame("mainPage");
+						driver.switchTo().frame(i); 
+						js.executeScript(hlight);
+						logger.info("切换 iframe 执行完毕" + (i + 1));
+
 					}
 
 				} /*else {
