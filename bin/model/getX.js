@@ -367,8 +367,21 @@ function getXbyNode(node) {
 		"iFrameUrl" : iFrameUrl,
 		"isInIFrameFlag" : isInIFrameFlag
 	}*/
+		//var tagName='输入框';
+		if(tagName == 'INPUT'){
+			tagname = '输入框';
+		}else if(tagName == 'BUTTON'){
+			tagname = '按钮';
+		}else if(tagName == 'TABLE'){
+			tagname = '表格';
+		}else{
+			tagname = '输入框';
+		}
 	
 	 resInfo['elementNm'] = elementNm;
+	 resInfo['tag'] = tagName.toUpperCase();
+	 resInfo['tagid'] = tagName.toUpperCase();;
+	 resInfo['tagname'] = tagname;
 	 resInfo['xpathEquals'] = xpathEquals;
 	 resInfo['firstXpath'] = firstXpath;
 	 resInfo['xpathContains'] = xpathContains;
@@ -390,7 +403,7 @@ console.log('----------start get element xpath----------------------');
 		return getXbyNode(node);
 };
 
-$(document).ready(function(){ 
+//$(document).ready(function(){ 
 	window.addEventListener('message', function(e){
 		//console.log("-------------" +  e.data.act + "-------------");
 		if (e.data.act == 'getElementInfo') {
@@ -411,5 +424,5 @@ $(document).ready(function(){
 		//	console.log('未定义的消息: '+ e.data.act);
 	   // }
 	}, false);
-});
+//});
 
