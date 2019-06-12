@@ -1,0 +1,2044 @@
+2019-06-06 14:13:18  [ main:0 ] - [ INFO ]  basePath:E:\esa\esw\bin 
+  2019-06-06 14:13:18  [ main:0 ] - [ INFO ]  model:hlight.js,batch.js
+ 
+  2019-06-06 14:13:18  [ main:0 ] - [ INFO ]  chromeDriverPath:E:\esa\esw\bin/driver/chromedriver.exe 
+  2019-06-06 14:13:18  [ main:0 ] - [ INFO ]  ieDriverPath:E:\esa\esw\bin/driver/chromedriver.exe 
+  2019-06-06 14:13:18  [ main:1 ] - [ INFO ]  browser:chrome 
+  2019-06-06 14:13:18  [ main:1 ] - [ INFO ]  defUrl:http://10.202.2.80/start.html 
+  2019-06-06 14:13:18  [ main:1 ] - [ INFO ]  types:input,a,button 
+  2019-06-06 14:13:18  [ main:1 ] - [ INFO ]  jqCdn:http://libs.baidu.com/jquery/2.1.1/jquery.min.js 
+  2019-06-06 14:13:18  [ main:1 ] - [ INFO ]  title:oneKey 
+  2019-06-06 14:13:18  [ main:1 ] - [ INFO ]  collectInt:3000 
+  2019-06-06 14:13:18  [ main:3 ] - [ INFO ]  file:hlight.js 
+  2019-06-06 14:13:18  [ main:3 ] - [ WARN ]  file:batch.js
+ not exists in model
+  2019-06-06 14:13:18  [ main:4 ] - [ INFO ]  scripts no jq:function getPageEles(types){
+	var tags=document.getElementsByTagName('*');
+	var typesArr = types.split(";");
+	console.log('----------start get element xpath----------------------');
+	var tag = [];
+	for (var i = 0; i < tags.length; i++) {
+		if(tags[i].tagName.toLowerCase().trim() != 'html' &&  tags[i].tagName.toLowerCase().trim() != 'body' 
+			&& tags[i].tagName.toLowerCase().trim() != 'script' &&  tags[i].tagName.toLowerCase().trim() != 'style' 
+				&&  tags[i].tagName.toLowerCase().trim() != 'body' &&  tags[i].tagName.toLowerCase().trim() != 'font' 
+					&&  tags[i].tagName.toLowerCase().trim() != 'link' &&  tags[i].tagName.toLowerCase().trim() != 'head'  
+						&&  tags[i].tagName.toLowerCase().trim() != 'meta' ){
+				if(typesArr.indexOf(tags[i].tagName.toLowerCase()) != -1){
+					tag.push(getXbyNode(tags[i]));
+				}
+		}
+	}
+	
+	return tag;
+
+}
+
+function getPageEle(type) {
+	var tags=document.getElementsByTagName('*');
+	console.log('----------start get element xpath----------------------');
+	var tag = [];
+	for (var i = 0; i < tags.length; i++) {
+		if(tags[i].tagName.toLowerCase().trim() != 'html' &&  tags[i].tagName.toLowerCase().trim() != 'body' 
+			&& tags[i].tagName.toLowerCase().trim() != 'script' &&  tags[i].tagName.toLowerCase().trim() != 'style' 
+				&&  tags[i].tagName.toLowerCase().trim() != 'body' &&  tags[i].tagName.toLowerCase().trim() != 'font' 
+					&&  tags[i].tagName.toLowerCase().trim() != 'link' &&  tags[i].tagName.toLowerCase().trim() != 'head'  
+						&&  tags[i].tagName.toLowerCase().trim() != 'meta'){
+			
+				if(tags[i].tagName.toLowerCase() != type){
+					tag.push(getXbyNode(tags[i]));
+				}
+			
+		}
+	}
+	
+	return tag;
+}
+
+function getIdOrName(b,s){
+	var frameSrc = "";
+	var frameName ="";
+	var frameId = "";
+	var tmp = "";
+	var frames= b.document.getElementsByTagName("iframe");
+	for(var i = 0; i < frames.length; i++){
+		var ff = frames[i];
+		frameSrc = ff.getAttribute("src");
+		frameName = ff.getAttribute("name");
+		frameId = ff.getAttribute("id");
+		if(s.indexOf(frameSrc) != -1){
+			if(frameName == ""){
+				tmp =  frameId;
+			}
+			if(frameId == ""){
+				tmp = frameName;
+			}
+			if(frameName =="" && frameId == ""){
+				tmp = (i+1);
+			}
+			if(frameName !="" && frameId != ""){
+				tmp =  frameId;
+			}
+			return tmp;
+			break;
+		}
+	}
+	
+	return tmp;
+};
+
+function getXbyNode(node) {
+	var tagName = node.nodeName.toLowerCase();
+	var xpathContainsArr = [];
+	var uniquesArr = [];
+	var threeStar = [];
+	var twoStar = [];
+	var oneStar = [];
+	var name, value, locator, xpathContains, xpathEquals, firstXpath;
+	var flag1 = true;
+	var flag2 = true;
+	var resultArrays = [];
+	var iFrameUrl = "na";
+	var isInIFrameFlag = "na";
+	var iFrameIdOrName = "na";
+	var idOrNames = "";
+	var pageTitle = "na";
+	var resInfo = {};
+	
+	try {
+		pageTitle = window.document.title;
+		console.log("pageTitle:" + pageTitle);
+		var isInIFrame = (window.location != window.parent.location);
+		if (isInIFrame == true) {
+			iFrameUrl = window.document.URL;
+			isInIFrameFlag = "ya";
+			var b = window.self;
+			var frameIdOrNames = "";
+			while (true) {
+				var u = b.document.URL;
+				frameIdOrNames = frameIdOrNames + " , " + u;
+				if (window.top == b) {
+					break;
+				}
+				b = b.parent;
+
+				var idOrName = getIdOrName(b, iFrameUrl);
+				if (idOrNames == "") {
+					idOrNames = idOrName;
+				} else {
+					idOrNames = idOrNames + "/" + idOrName;
+				}
+			}
+			//console.log("idOrNames:" + idOrNames);
+		}
+	} catch (err) {
+		console.log("-------------err:" + err);
+	}
+	
+	if (tagName != 'body') {
+		
+		for (var i = 0; i < node.attributes.length; i++) {
+			name = node.attributes[i].name;
+			value = node.attributes[i].value;
+			var isNoHrefFalg = (name.indexOf("href") === -1);
+			var isNoSrcFalg = (name.indexOf("src") === -1);
+			var isNoIdFalg = (name.indexOf("id") === -1);
+			var isNoHttpFlag = (value.indexOf("http") === -1);
+
+			if (value.indexOf("\'") < 0 && value.length > 0) {
+				if ((isNoHrefFalg) && (isNoSrcFalg)) {
+					xpathContains = "//" + tagName + "[contains(@" + name
+							+ ",\'" + value + "\')]";
+					xpathContainsArr.push(xpathContains);
+					var xpr = node.ownerDocument.evaluate("count("
+							+ xpathContains + ")", node.ownerDocument.body,
+							null, XPathResult.NUMBER_TYPE, null);
+					var bUnique = (xpr.numberValue === 1);
+					uniquesArr.push(bUnique);
+					if ((isNoIdFalg) && (isNoHttpFlag) && bUnique) {
+						threeStar.push(xpathContains);
+					} else if (bUnique) {
+						twoStar.push(xpathContains);
+					}
+				}
+
+				xpathEquals = "//" + tagName + "[@" + name + "=\'" + value
+						+ "\']";
+				xpathContainsArr.push(xpathEquals);
+				if (flag1 && (name != 'id')) {
+					if (firstXpath != undefined) {
+						firstXpath = firstXpath + "[@" + name + "=\'" + value
+								+ "\']";
+						flag1 = false;
+					} else {
+						firstXpath = xpathEquals;
+						flag1 = false;
+					}
+				}
+
+				xpr = node.ownerDocument.evaluate("count(" + xpathEquals + ")",
+						node.ownerDocument.body, null, XPathResult.NUMBER_TYPE,
+						null);
+				bUnique = (xpr.numberValue === 1);
+				uniquesArr.push(bUnique);
+
+				if (((isNoIdFalg) && (isNoHrefFalg) && (isNoSrcFalg) && (isNoHttpFlag))
+						&& bUnique) {
+					threeStar.push(xpathEquals);
+				} else if (bUnique) {
+					twoStar.push(xpathEquals);
+				}
+
+				if (value.indexOf("_") !== -1) {
+					var arr = value.split("_");
+					var newval = (arr[arr.length - 1])
+					value = newval;
+					xpathContains = "//" + tagName + "[contains(@" + name
+							+ ",\'" + value + "\')]";
+
+					if (name === 'ID' || name === 'id' || name === 'Id') {
+						if (firstXpath != undefined) {
+							firstXpath = firstXpath + "[contains(@" + name
+									+ ",\'" + value + "\')]";
+						} else {
+							firstXpath = xpathContains;
+						}
+					}
+
+					xpathContainsArr.push(xpathContains);
+					xpr = node.ownerDocument.evaluate("count(" + xpathContains
+							+ ")", node.ownerDocument.body, null,
+							XPathResult.NUMBER_TYPE, null);
+					bUnique = (xpr.numberValue === 1);
+					uniquesArr.push(bUnique);
+
+					if (((isNoIdFalg) && (isNoHrefFalg) && (isNoSrcFalg) && (isNoHttpFlag))
+							&& bUnique) {
+						threeStar.push(xpathContains);
+					} else if (bUnique) {
+						twoStar.push(xpathContains);
+					}
+				}
+
+				if (value.indexOf("$") !== -1) {
+					var arr = value.split("$");
+					var newval = (arr[arr.length - 1])
+					value = newval;
+					xpathContains = "//" + tagName + "[contains(@" + name
+							+ ",\'" + value + "\')]";
+					xpathContainsArr.push(xpathContains);
+					xpr = node.ownerDocument.evaluate("count(" + xpathContains
+							+ ")", node.ownerDocument.body, null,
+							XPathResult.NUMBER_TYPE, null);
+					bUnique = (xpr.numberValue === 1);
+					uniquesArr.push(bUnique);
+
+					if (((isNoIdFalg) && (isNoHrefFalg) && (isNoSrcFalg) && (isNoHttpFlag))
+							&& bUnique) {
+						threeStar.push(xpathContains);
+					} else if (bUnique) {
+						twoStar.push(xpathContains);
+					}
+				}
+			}
+			
+			resInfo[name] = value;
+		}
+		var nodeText = node.textContent.trim();
+		if (nodeText.indexOf("\'") < 0 && nodeText.length > 0) {
+			if (tagName != 'select') {
+				xpath = "//" + tagName + "[contains(.,\'" + nodeText + "\')]";
+				xpathContainsArr.push(xpath);
+				if (flag2) {
+					if (firstXpath != undefined) {
+						firstXpath = firstXpath + "[contains(.,\'" + nodeText
+								+ "\')]";
+						flag2 = false;
+					} else {
+						firstXpath = xpath;
+						flag2 = false;
+					}
+				}
+				var xpr = node.ownerDocument.evaluate("count(" + xpath + ")",
+						node.ownerDocument.body, null, XPathResult.NUMBER_TYPE,
+						null);
+				var bUnique = (xpr.numberValue === 1);
+				uniquesArr.push(bUnique);
+				if (bUnique) {
+					threeStar.push(xpath);
+				}
+			}
+
+		}
+		for (var i = 0; i < uniquesArr.length; i++) {
+			if (!uniquesArr[i]) {
+				var xpath = xpathContainsArr[i];
+				var nodes = document.evaluate(xpath, document, null,
+						XPathResult.ANY_TYPE, null);
+				var counts = document.evaluate("count(" + xpath + ")",
+						document, null, XPathResult.NUMBER_TYPE, null);
+				if (counts.numberValue == 0) {
+					oneStar.push(xpath);
+				}
+				var results = [], nodex;
+				var index = 0;
+				while (nodex = nodes.iterateNext()) {
+					index++;
+					if (nodex.isSameNode(node)) {
+						xpathContainsArr[i] = "(" + xpath + ")[" + index + "]";
+						oneStar.push("(" + xpath + ")[" + index + "]");
+					}
+				}
+			}
+		}
+		var nodes = document.evaluate(firstXpath, document, null,
+				XPathResult.ANY_TYPE, null);
+		var counts = document.evaluate("count(" + firstXpath + ")", document,
+				null, XPathResult.NUMBER_TYPE, null);
+		if (counts.numberValue > 1) {
+			var results = [], nodex;
+			var index = 0;
+			while (nodex = nodes.iterateNext()) {
+				index++;
+				if (nodex.isSameNode(node)) {
+					var tempXpath = "(" + firstXpath + ")[" + index + "]";
+					if (xpathContainsArr.indexOf(tempXpath) == -1) {
+						xpathContainsArr.unshift("(" + firstXpath + ")["
+								+ index + "]");
+						oneStar.unshift("(" + firstXpath + ")[" + index + "]");
+						uniquesArr.unshift(false);
+					}
+				}
+			}
+		} else {
+			if (xpathContainsArr.indexOf(firstXpath) == -1) {
+				xpathContainsArr.unshift(firstXpath);
+				uniquesArr.unshift(true);
+				if (firstXpath != undefined) {
+
+					var id = firstXpath.split("@")[1].startsWith("id");
+					var href = firstXpath.split("@")[1].startsWith("href");
+					var src = firstXpath.split("@")[1].startsWith("src");
+
+					if ((id == false) && (href == false) && (src == false)
+							&& (firstXpath.indexOf("http") === -1)) {
+						threeStar.unshift(firstXpath);
+					} else {
+						twoStar.unshift(firstXpath);
+					}
+				}
+			}
+		}
+
+		var elementNm = tagName;
+		if (nodeText != '') {
+			elementNm = nodeText;
+		}
+		
+		/* * * 
+		console.log('id--------' + id);
+		console.log('name--------' + name);
+		console.log('tag--------' + tagName);
+		console.log('text--------' + nodeText);
+		console.log('value--------' + value);
+		console.log('class--------' + value);
+		console.log('href--------' + href);
+		console.log('src--------' + src);
+		
+		console.log('threeStar--------'+ threeStar);
+		console.log('twoStar--------'+ twoStar);
+		console.log('oneStar--------'+ oneStar);
+		console.log('iFrameIdOrName--------'+ idOrNames);
+		console.log('elementNm--------'+ elementNm);
+		console.log('pageTitle--------'+ pageTitle);
+		console.log('idOrNames--------'+ idOrNames);
+		console.log('iFrameUrl--------'+ iFrameUrl);
+		console.log('isInIFrameFlag--------'+ isInIFrameFlag);
+		 console.log('idOrNames--------'+ idOrNames);
+		console.log('pageTitle--------'+ pageTitle);
+		 * console.log('xpathContainsArr--------'+ xpathContainsArr);
+		 * console.log('uniquesArr--------'+ uniquesArr);
+		 * console.log('name--------'+ name); console.log('value--------'+
+		 * value); console.log('locator--------'+ locator);
+		 * console.log('xpathContains--------'+ xpathContains);
+		 * console.log('xpathEquals--------'+ xpathEquals);
+		 * console.log('firstXpath--------'+ firstXpath);
+		 * console.log('idOrNames--------'+ idOrNames);
+		 * console.log('iFrameIdOrName--------'+ iFrameIdOrName);
+		 * console.log('isInIFrameFlag--------'+ isInIFrameFlag);
+		 * console.log('iFrameIdOrName--------'+ iFrameIdOrName);
+		 * console.log('resultArrays--------'+ resultArrays);
+		 */
+		
+	}
+
+	console.log('----------get element xpath end----------------------');
+
+	/*resInfo = {
+		"elementNm" : elementNm,
+		"xpathEquals" : xpathEquals,
+		"firstXpath" : firstXpath,
+		"xpathContains" : xpathContains,
+		"iFrameUrl" : iFrameUrl,
+		"isInIFrameFlag" : isInIFrameFlag
+	}*/
+		//var tagName='输入框';
+		if(tagName == 'INPUT'){
+			tagname = '输入框';
+		}else if(tagName == 'BUTTON'){
+			tagname = '按钮';
+		}else if(tagName == 'TABLE'){
+			tagname = '表格';
+		}else{
+			tagname = '输入框';
+		}
+	
+	 resInfo['elementNm'] = elementNm;
+	 resInfo['tag'] = tagName.toUpperCase();
+	 resInfo['tagid'] = tagName.toUpperCase();;
+	 resInfo['tagname'] = tagname;
+	 resInfo['xpathEquals'] = xpathEquals;
+	 resInfo['firstXpath'] = firstXpath;
+	 resInfo['xpathContains'] = xpathContains;
+	 resInfo['threeStar'] = threeStar;
+	 resInfo['twoStar'] = twoStar;
+	 resInfo['oneStar'] = oneStar;
+	 resInfo['isInIFrameFlag'] = isInIFrameFlag;
+	 resInfo['iFrameIdOrName'] = idOrNames;
+	 resInfo['iFrameUrl'] = iFrameUrl;
+	 resInfo['pageTitle'] = pageTitle;
+
+	 
+	return resInfo;
+}
+
+function getX(event){
+console.log('----------start get element xpath----------------------');
+		var node=event.target 
+		return getXbyNode(node);
+};
+
+//$(document).ready(function(){ 
+	window.addEventListener('message', function(e){
+		//console.log("-------------" +  e.data.act + "-------------");
+		if (e.data.act == 'getElementInfo') {
+			var resultElementInfo ="";
+			var types = e.data.msg.types;
+			console.log("-------------" +  types + "-------------");
+			var resultElementInfo = getPageEles(types);
+			
+			var data = {
+				act: 'resultElementInfo',
+				msg: {
+					 result:resultElementInfo
+					}
+			};
+			window.top.postMessage(data,'*');
+			console.log("-------------已发送,data:" + resultElementInfo + "-------------")
+	    } //else {
+		//	console.log('未定义的消息: '+ e.data.act);
+	   // }
+	}, false);
+//});
+
+var oldStyle = '';
+var target = '';
+function defvalue(att){
+	if(att == undefined){
+		return '';
+	}else{
+		return att;
+	}
+};
+
+function displayX(event){
+	var e = event || window.event;
+	target = e.target || e.srcElement;
+	console.log(target.innerHTML);
+	
+	var resJson = getX(e);
+	
+	oldStyle= target.style.border;
+	console.log(oldStyle);
+	target.style.border='3px solid red';
+	
+	var title = 'na';
+	title = window.document.title;
+	
+	var id = target.id;
+	var name = target.name;
+	var href = target.href;
+	var clss = target.className;
+	var value = target.value;
+	var txt = target.text;
+	var type= target.tagName;
+	var alias = 'na';
+	
+	/*
+	var maxsize = target.maxLength;
+	var outHtml = target.outerHTML;
+	var outText = target.outerText;
+	var ttype = target.type;
+	var nodeNm = target.nodeName;
+	var localNm = target.localName;
+	var isHidden = target.hidden;
+	var isDisabled = target.disabled;
+	var classNm = target.className;
+	var isAutoCmp = target.autocomplete;
+	var attrs = target.attributes;
+	var src = target.src;
+	var styles = target.style;
+	*/
+	
+	id = defvalue(id);
+	name = defvalue(name);
+	href = defvalue(href);
+	clss = defvalue(clss);
+	value = defvalue(value);
+	txt = defvalue(txt);
+	type = defvalue(type);
+
+	var framess = resJson['iFrameIdOrName'];
+	var xpath1= resJson['xpathEquals'];
+	var xpath2= resJson['firstXpath'];
+	var xpath3= resJson['xpathContains'];
+	
+	if(txt == '' || txt == undefined){
+		alias = type;
+	}else{
+		alias = txt;
+	}
+	
+	console.log("-------------CURRENT ELEMENT INFO-------------");
+	console.log("---title: "+ title);
+	console.log("---id: "+ id + ", name: " + name + ", type: " + type + ", class: " + clss);
+	console.log("---href: "+ href + ", value: " + value + ", text: " + txt + ', alias:' + alias);
+	console.log("---frame: " + framess );
+	console.log("---xpath1: " + xpath1);
+	console.log("---xpath2: " + xpath2);
+	console.log("---xpath3: " + xpath3);
+	
+	var data = {
+		act: 'elementInfo',
+		msg: {
+			title:title,
+			id: id, 
+			alias: alias, //元素名称
+			name: name,
+			href: href,
+			clss: clss,
+			value: value,
+			txt: txt,
+			type: type,
+			xpath1:xpath1,
+			xpath2:xpath2,
+			xpath3:xpath3,
+			framess:framess
+		}
+	};
+	window.top.postMessage(data, '*');
+	
+};
+
+function reStyle(event){
+	//var e = event || window.event;
+	//var target = e.target || e.srcElement;
+	target.style.border='';;
+};
+
+//document.ready=function(){
+			var es = document.getElementsByTagName("input");
+			for (i = 0; i < es.length; i++) {
+				
+				es[i].addEventListener("mousemove", function(event){ 
+					console.log('---------change------------');
+					displayX(event); 
+				});
+				
+				es[i].addEventListener("mouseout", function(event){ 
+					console.log('-------restore-------');
+					reStyle(event); 
+				});
+	};
+//};
+
+var oldStyle = '';
+var target = '';
+function defvalue(att){
+	if(att == undefined){
+		return '';
+	}else{
+		return att;
+	}
+};
+
+function displayX(event){
+	var e = event || window.event;
+	target = e.target || e.srcElement;
+	console.log(target.innerHTML);
+	
+	var resJson = getX(e);
+	
+	oldStyle= target.style.border;
+	console.log(oldStyle);
+	target.style.border='3px solid red';
+	
+	var title = 'na';
+	title = window.document.title;
+	
+	var id = target.id;
+	var name = target.name;
+	var href = target.href;
+	var clss = target.className;
+	var value = target.value;
+	var txt = target.text;
+	var type= target.tagName;
+	var alias = 'na';
+	
+	/*
+	var maxsize = target.maxLength;
+	var outHtml = target.outerHTML;
+	var outText = target.outerText;
+	var ttype = target.type;
+	var nodeNm = target.nodeName;
+	var localNm = target.localName;
+	var isHidden = target.hidden;
+	var isDisabled = target.disabled;
+	var classNm = target.className;
+	var isAutoCmp = target.autocomplete;
+	var attrs = target.attributes;
+	var src = target.src;
+	var styles = target.style;
+	*/
+	
+	id = defvalue(id);
+	name = defvalue(name);
+	href = defvalue(href);
+	clss = defvalue(clss);
+	value = defvalue(value);
+	txt = defvalue(txt);
+	type = defvalue(type);
+
+	var framess = resJson['iFrameIdOrName'];
+	var xpath1= resJson['xpathEquals'];
+	var xpath2= resJson['firstXpath'];
+	var xpath3= resJson['xpathContains'];
+	
+	if(txt == '' || txt == undefined){
+		alias = type;
+	}else{
+		alias = txt;
+	}
+	
+	console.log("-------------CURRENT ELEMENT INFO-------------");
+	console.log("---title: "+ title);
+	console.log("---id: "+ id + ", name: " + name + ", type: " + type + ", class: " + clss);
+	console.log("---href: "+ href + ", value: " + value + ", text: " + txt + ', alias:' + alias);
+	console.log("---frame: " + framess );
+	console.log("---xpath1: " + xpath1);
+	console.log("---xpath2: " + xpath2);
+	console.log("---xpath3: " + xpath3);
+	
+	var data = {
+		act: 'elementInfo',
+		msg: {
+			title:title,
+			id: id, 
+			alias: alias, //元素名称
+			name: name,
+			href: href,
+			clss: clss,
+			value: value,
+			txt: txt,
+			type: type,
+			xpath1:xpath1,
+			xpath2:xpath2,
+			xpath3:xpath3,
+			framess:framess
+		}
+	};
+	window.top.postMessage(data, '*');
+	
+};
+
+function reStyle(event){
+	//var e = event || window.event;
+	//var target = e.target || e.srcElement;
+	target.style.border='';;
+};
+
+//document.ready=function(){
+			var es = document.getElementsByTagName("a");
+			for (i = 0; i < es.length; i++) {
+				
+				es[i].addEventListener("mousemove", function(event){ 
+					console.log('---------change------------');
+					displayX(event); 
+				});
+				
+				es[i].addEventListener("mouseout", function(event){ 
+					console.log('-------restore-------');
+					reStyle(event); 
+				});
+	};
+//};
+
+var oldStyle = '';
+var target = '';
+function defvalue(att){
+	if(att == undefined){
+		return '';
+	}else{
+		return att;
+	}
+};
+
+function displayX(event){
+	var e = event || window.event;
+	target = e.target || e.srcElement;
+	console.log(target.innerHTML);
+	
+	var resJson = getX(e);
+	
+	oldStyle= target.style.border;
+	console.log(oldStyle);
+	target.style.border='3px solid red';
+	
+	var title = 'na';
+	title = window.document.title;
+	
+	var id = target.id;
+	var name = target.name;
+	var href = target.href;
+	var clss = target.className;
+	var value = target.value;
+	var txt = target.text;
+	var type= target.tagName;
+	var alias = 'na';
+	
+	/*
+	var maxsize = target.maxLength;
+	var outHtml = target.outerHTML;
+	var outText = target.outerText;
+	var ttype = target.type;
+	var nodeNm = target.nodeName;
+	var localNm = target.localName;
+	var isHidden = target.hidden;
+	var isDisabled = target.disabled;
+	var classNm = target.className;
+	var isAutoCmp = target.autocomplete;
+	var attrs = target.attributes;
+	var src = target.src;
+	var styles = target.style;
+	*/
+	
+	id = defvalue(id);
+	name = defvalue(name);
+	href = defvalue(href);
+	clss = defvalue(clss);
+	value = defvalue(value);
+	txt = defvalue(txt);
+	type = defvalue(type);
+
+	var framess = resJson['iFrameIdOrName'];
+	var xpath1= resJson['xpathEquals'];
+	var xpath2= resJson['firstXpath'];
+	var xpath3= resJson['xpathContains'];
+	
+	if(txt == '' || txt == undefined){
+		alias = type;
+	}else{
+		alias = txt;
+	}
+	
+	console.log("-------------CURRENT ELEMENT INFO-------------");
+	console.log("---title: "+ title);
+	console.log("---id: "+ id + ", name: " + name + ", type: " + type + ", class: " + clss);
+	console.log("---href: "+ href + ", value: " + value + ", text: " + txt + ', alias:' + alias);
+	console.log("---frame: " + framess );
+	console.log("---xpath1: " + xpath1);
+	console.log("---xpath2: " + xpath2);
+	console.log("---xpath3: " + xpath3);
+	
+	var data = {
+		act: 'elementInfo',
+		msg: {
+			title:title,
+			id: id, 
+			alias: alias, //元素名称
+			name: name,
+			href: href,
+			clss: clss,
+			value: value,
+			txt: txt,
+			type: type,
+			xpath1:xpath1,
+			xpath2:xpath2,
+			xpath3:xpath3,
+			framess:framess
+		}
+	};
+	window.top.postMessage(data, '*');
+	
+};
+
+function reStyle(event){
+	//var e = event || window.event;
+	//var target = e.target || e.srcElement;
+	target.style.border='';;
+};
+
+//document.ready=function(){
+			var es = document.getElementsByTagName("button");
+			for (i = 0; i < es.length; i++) {
+				
+				es[i].addEventListener("mousemove", function(event){ 
+					console.log('---------change------------');
+					displayX(event); 
+				});
+				
+				es[i].addEventListener("mouseout", function(event){ 
+					console.log('-------restore-------');
+					reStyle(event); 
+				});
+	};
+//};
+
+var oldStyle = '';
+var target = '';
+function defvalue(att){
+	if(att == undefined){
+		return '';
+	}else{
+		return att;
+	}
+};
+
+function displayX(event){
+	var e = event || window.event;
+	target = e.target || e.srcElement;
+	console.log(target.innerHTML);
+	
+	var resJson = getX(e);
+	
+	oldStyle= target.style.border;
+	console.log(oldStyle);
+	target.style.border='3px solid red';
+	
+	var title = 'na';
+	title = window.document.title;
+	
+	var id = target.id;
+	var name = target.name;
+	var href = target.href;
+	var clss = target.className;
+	var value = target.value;
+	var txt = target.text;
+	var type= target.tagName;
+	var alias = 'na';
+	
+	/*
+	var maxsize = target.maxLength;
+	var outHtml = target.outerHTML;
+	var outText = target.outerText;
+	var ttype = target.type;
+	var nodeNm = target.nodeName;
+	var localNm = target.localName;
+	var isHidden = target.hidden;
+	var isDisabled = target.disabled;
+	var classNm = target.className;
+	var isAutoCmp = target.autocomplete;
+	var attrs = target.attributes;
+	var src = target.src;
+	var styles = target.style;
+	*/
+	
+	id = defvalue(id);
+	name = defvalue(name);
+	href = defvalue(href);
+	clss = defvalue(clss);
+	value = defvalue(value);
+	txt = defvalue(txt);
+	type = defvalue(type);
+
+	var framess = resJson['iFrameIdOrName'];
+	var xpath1= resJson['xpathEquals'];
+	var xpath2= resJson['firstXpath'];
+	var xpath3= resJson['xpathContains'];
+	
+	if(txt == '' || txt == undefined){
+		alias = type;
+	}else{
+		alias = txt;
+	}
+	
+	console.log("-------------CURRENT ELEMENT INFO-------------");
+	console.log("---title: "+ title);
+	console.log("---id: "+ id + ", name: " + name + ", type: " + type + ", class: " + clss);
+	console.log("---href: "+ href + ", value: " + value + ", text: " + txt + ', alias:' + alias);
+	console.log("---frame: " + framess );
+	console.log("---xpath1: " + xpath1);
+	console.log("---xpath2: " + xpath2);
+	console.log("---xpath3: " + xpath3);
+	
+	var data = {
+		act: 'elementInfo',
+		msg: {
+			title:title,
+			id: id, 
+			alias: alias, //元素名称
+			name: name,
+			href: href,
+			clss: clss,
+			value: value,
+			txt: txt,
+			type: type,
+			xpath1:xpath1,
+			xpath2:xpath2,
+			xpath3:xpath3,
+			framess:framess
+		}
+	};
+	window.top.postMessage(data, '*');
+	
+};
+
+function reStyle(event){
+	//var e = event || window.event;
+	//var target = e.target || e.srcElement;
+	target.style.border='';;
+};
+
+//document.ready=function(){
+			var es = document.getElementsByTagName("HLTYPE");
+			for (i = 0; i < es.length; i++) {
+				
+				es[i].addEventListener("mousemove", function(event){ 
+					console.log('---------change------------');
+					displayX(event); 
+				});
+				
+				es[i].addEventListener("mouseout", function(event){ 
+					console.log('-------restore-------');
+					reStyle(event); 
+				});
+	};
+//};
+
+
+  2019-06-06 14:13:18  [ main:5 ] - [ INFO ]  scripts with jq:var script = document.createElement("script");script.type = "text/javascript";script.src = "http://libs.baidu.com/jquery/2.1.1/jquery.min.js";document.getElementsByTagName("head")[0].appendChild(script);function getPageEles(types){
+	var tags=document.getElementsByTagName('*');
+	var typesArr = types.split(";");
+	console.log('----------start get element xpath----------------------');
+	var tag = [];
+	for (var i = 0; i < tags.length; i++) {
+		if(tags[i].tagName.toLowerCase().trim() != 'html' &&  tags[i].tagName.toLowerCase().trim() != 'body' 
+			&& tags[i].tagName.toLowerCase().trim() != 'script' &&  tags[i].tagName.toLowerCase().trim() != 'style' 
+				&&  tags[i].tagName.toLowerCase().trim() != 'body' &&  tags[i].tagName.toLowerCase().trim() != 'font' 
+					&&  tags[i].tagName.toLowerCase().trim() != 'link' &&  tags[i].tagName.toLowerCase().trim() != 'head'  
+						&&  tags[i].tagName.toLowerCase().trim() != 'meta' ){
+				if(typesArr.indexOf(tags[i].tagName.toLowerCase()) != -1){
+					tag.push(getXbyNode(tags[i]));
+				}
+		}
+	}
+	
+	return tag;
+
+}
+
+function getPageEle(type) {
+	var tags=document.getElementsByTagName('*');
+	console.log('----------start get element xpath----------------------');
+	var tag = [];
+	for (var i = 0; i < tags.length; i++) {
+		if(tags[i].tagName.toLowerCase().trim() != 'html' &&  tags[i].tagName.toLowerCase().trim() != 'body' 
+			&& tags[i].tagName.toLowerCase().trim() != 'script' &&  tags[i].tagName.toLowerCase().trim() != 'style' 
+				&&  tags[i].tagName.toLowerCase().trim() != 'body' &&  tags[i].tagName.toLowerCase().trim() != 'font' 
+					&&  tags[i].tagName.toLowerCase().trim() != 'link' &&  tags[i].tagName.toLowerCase().trim() != 'head'  
+						&&  tags[i].tagName.toLowerCase().trim() != 'meta'){
+			
+				if(tags[i].tagName.toLowerCase() != type){
+					tag.push(getXbyNode(tags[i]));
+				}
+			
+		}
+	}
+	
+	return tag;
+}
+
+function getIdOrName(b,s){
+	var frameSrc = "";
+	var frameName ="";
+	var frameId = "";
+	var tmp = "";
+	var frames= b.document.getElementsByTagName("iframe");
+	for(var i = 0; i < frames.length; i++){
+		var ff = frames[i];
+		frameSrc = ff.getAttribute("src");
+		frameName = ff.getAttribute("name");
+		frameId = ff.getAttribute("id");
+		if(s.indexOf(frameSrc) != -1){
+			if(frameName == ""){
+				tmp =  frameId;
+			}
+			if(frameId == ""){
+				tmp = frameName;
+			}
+			if(frameName =="" && frameId == ""){
+				tmp = (i+1);
+			}
+			if(frameName !="" && frameId != ""){
+				tmp =  frameId;
+			}
+			return tmp;
+			break;
+		}
+	}
+	
+	return tmp;
+};
+
+function getXbyNode(node) {
+	var tagName = node.nodeName.toLowerCase();
+	var xpathContainsArr = [];
+	var uniquesArr = [];
+	var threeStar = [];
+	var twoStar = [];
+	var oneStar = [];
+	var name, value, locator, xpathContains, xpathEquals, firstXpath;
+	var flag1 = true;
+	var flag2 = true;
+	var resultArrays = [];
+	var iFrameUrl = "na";
+	var isInIFrameFlag = "na";
+	var iFrameIdOrName = "na";
+	var idOrNames = "";
+	var pageTitle = "na";
+	var resInfo = {};
+	
+	try {
+		pageTitle = window.document.title;
+		console.log("pageTitle:" + pageTitle);
+		var isInIFrame = (window.location != window.parent.location);
+		if (isInIFrame == true) {
+			iFrameUrl = window.document.URL;
+			isInIFrameFlag = "ya";
+			var b = window.self;
+			var frameIdOrNames = "";
+			while (true) {
+				var u = b.document.URL;
+				frameIdOrNames = frameIdOrNames + " , " + u;
+				if (window.top == b) {
+					break;
+				}
+				b = b.parent;
+
+				var idOrName = getIdOrName(b, iFrameUrl);
+				if (idOrNames == "") {
+					idOrNames = idOrName;
+				} else {
+					idOrNames = idOrNames + "/" + idOrName;
+				}
+			}
+			//console.log("idOrNames:" + idOrNames);
+		}
+	} catch (err) {
+		console.log("-------------err:" + err);
+	}
+	
+	if (tagName != 'body') {
+		
+		for (var i = 0; i < node.attributes.length; i++) {
+			name = node.attributes[i].name;
+			value = node.attributes[i].value;
+			var isNoHrefFalg = (name.indexOf("href") === -1);
+			var isNoSrcFalg = (name.indexOf("src") === -1);
+			var isNoIdFalg = (name.indexOf("id") === -1);
+			var isNoHttpFlag = (value.indexOf("http") === -1);
+
+			if (value.indexOf("\'") < 0 && value.length > 0) {
+				if ((isNoHrefFalg) && (isNoSrcFalg)) {
+					xpathContains = "//" + tagName + "[contains(@" + name
+							+ ",\'" + value + "\')]";
+					xpathContainsArr.push(xpathContains);
+					var xpr = node.ownerDocument.evaluate("count("
+							+ xpathContains + ")", node.ownerDocument.body,
+							null, XPathResult.NUMBER_TYPE, null);
+					var bUnique = (xpr.numberValue === 1);
+					uniquesArr.push(bUnique);
+					if ((isNoIdFalg) && (isNoHttpFlag) && bUnique) {
+						threeStar.push(xpathContains);
+					} else if (bUnique) {
+						twoStar.push(xpathContains);
+					}
+				}
+
+				xpathEquals = "//" + tagName + "[@" + name + "=\'" + value
+						+ "\']";
+				xpathContainsArr.push(xpathEquals);
+				if (flag1 && (name != 'id')) {
+					if (firstXpath != undefined) {
+						firstXpath = firstXpath + "[@" + name + "=\'" + value
+								+ "\']";
+						flag1 = false;
+					} else {
+						firstXpath = xpathEquals;
+						flag1 = false;
+					}
+				}
+
+				xpr = node.ownerDocument.evaluate("count(" + xpathEquals + ")",
+						node.ownerDocument.body, null, XPathResult.NUMBER_TYPE,
+						null);
+				bUnique = (xpr.numberValue === 1);
+				uniquesArr.push(bUnique);
+
+				if (((isNoIdFalg) && (isNoHrefFalg) && (isNoSrcFalg) && (isNoHttpFlag))
+						&& bUnique) {
+					threeStar.push(xpathEquals);
+				} else if (bUnique) {
+					twoStar.push(xpathEquals);
+				}
+
+				if (value.indexOf("_") !== -1) {
+					var arr = value.split("_");
+					var newval = (arr[arr.length - 1])
+					value = newval;
+					xpathContains = "//" + tagName + "[contains(@" + name
+							+ ",\'" + value + "\')]";
+
+					if (name === 'ID' || name === 'id' || name === 'Id') {
+						if (firstXpath != undefined) {
+							firstXpath = firstXpath + "[contains(@" + name
+									+ ",\'" + value + "\')]";
+						} else {
+							firstXpath = xpathContains;
+						}
+					}
+
+					xpathContainsArr.push(xpathContains);
+					xpr = node.ownerDocument.evaluate("count(" + xpathContains
+							+ ")", node.ownerDocument.body, null,
+							XPathResult.NUMBER_TYPE, null);
+					bUnique = (xpr.numberValue === 1);
+					uniquesArr.push(bUnique);
+
+					if (((isNoIdFalg) && (isNoHrefFalg) && (isNoSrcFalg) && (isNoHttpFlag))
+							&& bUnique) {
+						threeStar.push(xpathContains);
+					} else if (bUnique) {
+						twoStar.push(xpathContains);
+					}
+				}
+
+				if (value.indexOf("$") !== -1) {
+					var arr = value.split("$");
+					var newval = (arr[arr.length - 1])
+					value = newval;
+					xpathContains = "//" + tagName + "[contains(@" + name
+							+ ",\'" + value + "\')]";
+					xpathContainsArr.push(xpathContains);
+					xpr = node.ownerDocument.evaluate("count(" + xpathContains
+							+ ")", node.ownerDocument.body, null,
+							XPathResult.NUMBER_TYPE, null);
+					bUnique = (xpr.numberValue === 1);
+					uniquesArr.push(bUnique);
+
+					if (((isNoIdFalg) && (isNoHrefFalg) && (isNoSrcFalg) && (isNoHttpFlag))
+							&& bUnique) {
+						threeStar.push(xpathContains);
+					} else if (bUnique) {
+						twoStar.push(xpathContains);
+					}
+				}
+			}
+			
+			resInfo[name] = value;
+		}
+		var nodeText = node.textContent.trim();
+		if (nodeText.indexOf("\'") < 0 && nodeText.length > 0) {
+			if (tagName != 'select') {
+				xpath = "//" + tagName + "[contains(.,\'" + nodeText + "\')]";
+				xpathContainsArr.push(xpath);
+				if (flag2) {
+					if (firstXpath != undefined) {
+						firstXpath = firstXpath + "[contains(.,\'" + nodeText
+								+ "\')]";
+						flag2 = false;
+					} else {
+						firstXpath = xpath;
+						flag2 = false;
+					}
+				}
+				var xpr = node.ownerDocument.evaluate("count(" + xpath + ")",
+						node.ownerDocument.body, null, XPathResult.NUMBER_TYPE,
+						null);
+				var bUnique = (xpr.numberValue === 1);
+				uniquesArr.push(bUnique);
+				if (bUnique) {
+					threeStar.push(xpath);
+				}
+			}
+
+		}
+		for (var i = 0; i < uniquesArr.length; i++) {
+			if (!uniquesArr[i]) {
+				var xpath = xpathContainsArr[i];
+				var nodes = document.evaluate(xpath, document, null,
+						XPathResult.ANY_TYPE, null);
+				var counts = document.evaluate("count(" + xpath + ")",
+						document, null, XPathResult.NUMBER_TYPE, null);
+				if (counts.numberValue == 0) {
+					oneStar.push(xpath);
+				}
+				var results = [], nodex;
+				var index = 0;
+				while (nodex = nodes.iterateNext()) {
+					index++;
+					if (nodex.isSameNode(node)) {
+						xpathContainsArr[i] = "(" + xpath + ")[" + index + "]";
+						oneStar.push("(" + xpath + ")[" + index + "]");
+					}
+				}
+			}
+		}
+		var nodes = document.evaluate(firstXpath, document, null,
+				XPathResult.ANY_TYPE, null);
+		var counts = document.evaluate("count(" + firstXpath + ")", document,
+				null, XPathResult.NUMBER_TYPE, null);
+		if (counts.numberValue > 1) {
+			var results = [], nodex;
+			var index = 0;
+			while (nodex = nodes.iterateNext()) {
+				index++;
+				if (nodex.isSameNode(node)) {
+					var tempXpath = "(" + firstXpath + ")[" + index + "]";
+					if (xpathContainsArr.indexOf(tempXpath) == -1) {
+						xpathContainsArr.unshift("(" + firstXpath + ")["
+								+ index + "]");
+						oneStar.unshift("(" + firstXpath + ")[" + index + "]");
+						uniquesArr.unshift(false);
+					}
+				}
+			}
+		} else {
+			if (xpathContainsArr.indexOf(firstXpath) == -1) {
+				xpathContainsArr.unshift(firstXpath);
+				uniquesArr.unshift(true);
+				if (firstXpath != undefined) {
+
+					var id = firstXpath.split("@")[1].startsWith("id");
+					var href = firstXpath.split("@")[1].startsWith("href");
+					var src = firstXpath.split("@")[1].startsWith("src");
+
+					if ((id == false) && (href == false) && (src == false)
+							&& (firstXpath.indexOf("http") === -1)) {
+						threeStar.unshift(firstXpath);
+					} else {
+						twoStar.unshift(firstXpath);
+					}
+				}
+			}
+		}
+
+		var elementNm = tagName;
+		if (nodeText != '') {
+			elementNm = nodeText;
+		}
+		
+		/* * * 
+		console.log('id--------' + id);
+		console.log('name--------' + name);
+		console.log('tag--------' + tagName);
+		console.log('text--------' + nodeText);
+		console.log('value--------' + value);
+		console.log('class--------' + value);
+		console.log('href--------' + href);
+		console.log('src--------' + src);
+		
+		console.log('threeStar--------'+ threeStar);
+		console.log('twoStar--------'+ twoStar);
+		console.log('oneStar--------'+ oneStar);
+		console.log('iFrameIdOrName--------'+ idOrNames);
+		console.log('elementNm--------'+ elementNm);
+		console.log('pageTitle--------'+ pageTitle);
+		console.log('idOrNames--------'+ idOrNames);
+		console.log('iFrameUrl--------'+ iFrameUrl);
+		console.log('isInIFrameFlag--------'+ isInIFrameFlag);
+		 console.log('idOrNames--------'+ idOrNames);
+		console.log('pageTitle--------'+ pageTitle);
+		 * console.log('xpathContainsArr--------'+ xpathContainsArr);
+		 * console.log('uniquesArr--------'+ uniquesArr);
+		 * console.log('name--------'+ name); console.log('value--------'+
+		 * value); console.log('locator--------'+ locator);
+		 * console.log('xpathContains--------'+ xpathContains);
+		 * console.log('xpathEquals--------'+ xpathEquals);
+		 * console.log('firstXpath--------'+ firstXpath);
+		 * console.log('idOrNames--------'+ idOrNames);
+		 * console.log('iFrameIdOrName--------'+ iFrameIdOrName);
+		 * console.log('isInIFrameFlag--------'+ isInIFrameFlag);
+		 * console.log('iFrameIdOrName--------'+ iFrameIdOrName);
+		 * console.log('resultArrays--------'+ resultArrays);
+		 */
+		
+	}
+
+	console.log('----------get element xpath end----------------------');
+
+	/*resInfo = {
+		"elementNm" : elementNm,
+		"xpathEquals" : xpathEquals,
+		"firstXpath" : firstXpath,
+		"xpathContains" : xpathContains,
+		"iFrameUrl" : iFrameUrl,
+		"isInIFrameFlag" : isInIFrameFlag
+	}*/
+		//var tagName='输入框';
+		if(tagName == 'INPUT'){
+			tagname = '输入框';
+		}else if(tagName == 'BUTTON'){
+			tagname = '按钮';
+		}else if(tagName == 'TABLE'){
+			tagname = '表格';
+		}else{
+			tagname = '输入框';
+		}
+	
+	 resInfo['elementNm'] = elementNm;
+	 resInfo['tag'] = tagName.toUpperCase();
+	 resInfo['tagid'] = tagName.toUpperCase();;
+	 resInfo['tagname'] = tagname;
+	 resInfo['xpathEquals'] = xpathEquals;
+	 resInfo['firstXpath'] = firstXpath;
+	 resInfo['xpathContains'] = xpathContains;
+	 resInfo['threeStar'] = threeStar;
+	 resInfo['twoStar'] = twoStar;
+	 resInfo['oneStar'] = oneStar;
+	 resInfo['isInIFrameFlag'] = isInIFrameFlag;
+	 resInfo['iFrameIdOrName'] = idOrNames;
+	 resInfo['iFrameUrl'] = iFrameUrl;
+	 resInfo['pageTitle'] = pageTitle;
+
+	 
+	return resInfo;
+}
+
+function getX(event){
+console.log('----------start get element xpath----------------------');
+		var node=event.target 
+		return getXbyNode(node);
+};
+
+//$(document).ready(function(){ 
+	window.addEventListener('message', function(e){
+		//console.log("-------------" +  e.data.act + "-------------");
+		if (e.data.act == 'getElementInfo') {
+			var resultElementInfo ="";
+			var types = e.data.msg.types;
+			console.log("-------------" +  types + "-------------");
+			var resultElementInfo = getPageEles(types);
+			
+			var data = {
+				act: 'resultElementInfo',
+				msg: {
+					 result:resultElementInfo
+					}
+			};
+			window.top.postMessage(data,'*');
+			console.log("-------------已发送,data:" + resultElementInfo + "-------------")
+	    } //else {
+		//	console.log('未定义的消息: '+ e.data.act);
+	   // }
+	}, false);
+//});
+
+var oldStyle = '';
+var target = '';
+function defvalue(att){
+	if(att == undefined){
+		return '';
+	}else{
+		return att;
+	}
+};
+
+function displayX(event){
+	var e = event || window.event;
+	target = e.target || e.srcElement;
+	console.log(target.innerHTML);
+	
+	var resJson = getX(e);
+	
+	oldStyle= target.style.border;
+	console.log(oldStyle);
+	target.style.border='3px solid red';
+	
+	var title = 'na';
+	title = window.document.title;
+	
+	var id = target.id;
+	var name = target.name;
+	var href = target.href;
+	var clss = target.className;
+	var value = target.value;
+	var txt = target.text;
+	var type= target.tagName;
+	var alias = 'na';
+	
+	/*
+	var maxsize = target.maxLength;
+	var outHtml = target.outerHTML;
+	var outText = target.outerText;
+	var ttype = target.type;
+	var nodeNm = target.nodeName;
+	var localNm = target.localName;
+	var isHidden = target.hidden;
+	var isDisabled = target.disabled;
+	var classNm = target.className;
+	var isAutoCmp = target.autocomplete;
+	var attrs = target.attributes;
+	var src = target.src;
+	var styles = target.style;
+	*/
+	
+	id = defvalue(id);
+	name = defvalue(name);
+	href = defvalue(href);
+	clss = defvalue(clss);
+	value = defvalue(value);
+	txt = defvalue(txt);
+	type = defvalue(type);
+
+	var framess = resJson['iFrameIdOrName'];
+	var xpath1= resJson['xpathEquals'];
+	var xpath2= resJson['firstXpath'];
+	var xpath3= resJson['xpathContains'];
+	
+	if(txt == '' || txt == undefined){
+		alias = type;
+	}else{
+		alias = txt;
+	}
+	
+	console.log("-------------CURRENT ELEMENT INFO-------------");
+	console.log("---title: "+ title);
+	console.log("---id: "+ id + ", name: " + name + ", type: " + type + ", class: " + clss);
+	console.log("---href: "+ href + ", value: " + value + ", text: " + txt + ', alias:' + alias);
+	console.log("---frame: " + framess );
+	console.log("---xpath1: " + xpath1);
+	console.log("---xpath2: " + xpath2);
+	console.log("---xpath3: " + xpath3);
+	
+	var data = {
+		act: 'elementInfo',
+		msg: {
+			title:title,
+			id: id, 
+			alias: alias, //元素名称
+			name: name,
+			href: href,
+			clss: clss,
+			value: value,
+			txt: txt,
+			type: type,
+			xpath1:xpath1,
+			xpath2:xpath2,
+			xpath3:xpath3,
+			framess:framess
+		}
+	};
+	window.top.postMessage(data, '*');
+	
+};
+
+function reStyle(event){
+	//var e = event || window.event;
+	//var target = e.target || e.srcElement;
+	target.style.border='';;
+};
+
+//document.ready=function(){
+			var es = document.getElementsByTagName("input");
+			for (i = 0; i < es.length; i++) {
+				
+				es[i].addEventListener("mousemove", function(event){ 
+					console.log('---------change------------');
+					displayX(event); 
+				});
+				
+				es[i].addEventListener("mouseout", function(event){ 
+					console.log('-------restore-------');
+					reStyle(event); 
+				});
+	};
+//};
+
+var oldStyle = '';
+var target = '';
+function defvalue(att){
+	if(att == undefined){
+		return '';
+	}else{
+		return att;
+	}
+};
+
+function displayX(event){
+	var e = event || window.event;
+	target = e.target || e.srcElement;
+	console.log(target.innerHTML);
+	
+	var resJson = getX(e);
+	
+	oldStyle= target.style.border;
+	console.log(oldStyle);
+	target.style.border='3px solid red';
+	
+	var title = 'na';
+	title = window.document.title;
+	
+	var id = target.id;
+	var name = target.name;
+	var href = target.href;
+	var clss = target.className;
+	var value = target.value;
+	var txt = target.text;
+	var type= target.tagName;
+	var alias = 'na';
+	
+	/*
+	var maxsize = target.maxLength;
+	var outHtml = target.outerHTML;
+	var outText = target.outerText;
+	var ttype = target.type;
+	var nodeNm = target.nodeName;
+	var localNm = target.localName;
+	var isHidden = target.hidden;
+	var isDisabled = target.disabled;
+	var classNm = target.className;
+	var isAutoCmp = target.autocomplete;
+	var attrs = target.attributes;
+	var src = target.src;
+	var styles = target.style;
+	*/
+	
+	id = defvalue(id);
+	name = defvalue(name);
+	href = defvalue(href);
+	clss = defvalue(clss);
+	value = defvalue(value);
+	txt = defvalue(txt);
+	type = defvalue(type);
+
+	var framess = resJson['iFrameIdOrName'];
+	var xpath1= resJson['xpathEquals'];
+	var xpath2= resJson['firstXpath'];
+	var xpath3= resJson['xpathContains'];
+	
+	if(txt == '' || txt == undefined){
+		alias = type;
+	}else{
+		alias = txt;
+	}
+	
+	console.log("-------------CURRENT ELEMENT INFO-------------");
+	console.log("---title: "+ title);
+	console.log("---id: "+ id + ", name: " + name + ", type: " + type + ", class: " + clss);
+	console.log("---href: "+ href + ", value: " + value + ", text: " + txt + ', alias:' + alias);
+	console.log("---frame: " + framess );
+	console.log("---xpath1: " + xpath1);
+	console.log("---xpath2: " + xpath2);
+	console.log("---xpath3: " + xpath3);
+	
+	var data = {
+		act: 'elementInfo',
+		msg: {
+			title:title,
+			id: id, 
+			alias: alias, //元素名称
+			name: name,
+			href: href,
+			clss: clss,
+			value: value,
+			txt: txt,
+			type: type,
+			xpath1:xpath1,
+			xpath2:xpath2,
+			xpath3:xpath3,
+			framess:framess
+		}
+	};
+	window.top.postMessage(data, '*');
+	
+};
+
+function reStyle(event){
+	//var e = event || window.event;
+	//var target = e.target || e.srcElement;
+	target.style.border='';;
+};
+
+//document.ready=function(){
+			var es = document.getElementsByTagName("a");
+			for (i = 0; i < es.length; i++) {
+				
+				es[i].addEventListener("mousemove", function(event){ 
+					console.log('---------change------------');
+					displayX(event); 
+				});
+				
+				es[i].addEventListener("mouseout", function(event){ 
+					console.log('-------restore-------');
+					reStyle(event); 
+				});
+	};
+//};
+
+var oldStyle = '';
+var target = '';
+function defvalue(att){
+	if(att == undefined){
+		return '';
+	}else{
+		return att;
+	}
+};
+
+function displayX(event){
+	var e = event || window.event;
+	target = e.target || e.srcElement;
+	console.log(target.innerHTML);
+	
+	var resJson = getX(e);
+	
+	oldStyle= target.style.border;
+	console.log(oldStyle);
+	target.style.border='3px solid red';
+	
+	var title = 'na';
+	title = window.document.title;
+	
+	var id = target.id;
+	var name = target.name;
+	var href = target.href;
+	var clss = target.className;
+	var value = target.value;
+	var txt = target.text;
+	var type= target.tagName;
+	var alias = 'na';
+	
+	/*
+	var maxsize = target.maxLength;
+	var outHtml = target.outerHTML;
+	var outText = target.outerText;
+	var ttype = target.type;
+	var nodeNm = target.nodeName;
+	var localNm = target.localName;
+	var isHidden = target.hidden;
+	var isDisabled = target.disabled;
+	var classNm = target.className;
+	var isAutoCmp = target.autocomplete;
+	var attrs = target.attributes;
+	var src = target.src;
+	var styles = target.style;
+	*/
+	
+	id = defvalue(id);
+	name = defvalue(name);
+	href = defvalue(href);
+	clss = defvalue(clss);
+	value = defvalue(value);
+	txt = defvalue(txt);
+	type = defvalue(type);
+
+	var framess = resJson['iFrameIdOrName'];
+	var xpath1= resJson['xpathEquals'];
+	var xpath2= resJson['firstXpath'];
+	var xpath3= resJson['xpathContains'];
+	
+	if(txt == '' || txt == undefined){
+		alias = type;
+	}else{
+		alias = txt;
+	}
+	
+	console.log("-------------CURRENT ELEMENT INFO-------------");
+	console.log("---title: "+ title);
+	console.log("---id: "+ id + ", name: " + name + ", type: " + type + ", class: " + clss);
+	console.log("---href: "+ href + ", value: " + value + ", text: " + txt + ', alias:' + alias);
+	console.log("---frame: " + framess );
+	console.log("---xpath1: " + xpath1);
+	console.log("---xpath2: " + xpath2);
+	console.log("---xpath3: " + xpath3);
+	
+	var data = {
+		act: 'elementInfo',
+		msg: {
+			title:title,
+			id: id, 
+			alias: alias, //元素名称
+			name: name,
+			href: href,
+			clss: clss,
+			value: value,
+			txt: txt,
+			type: type,
+			xpath1:xpath1,
+			xpath2:xpath2,
+			xpath3:xpath3,
+			framess:framess
+		}
+	};
+	window.top.postMessage(data, '*');
+	
+};
+
+function reStyle(event){
+	//var e = event || window.event;
+	//var target = e.target || e.srcElement;
+	target.style.border='';;
+};
+
+//document.ready=function(){
+			var es = document.getElementsByTagName("button");
+			for (i = 0; i < es.length; i++) {
+				
+				es[i].addEventListener("mousemove", function(event){ 
+					console.log('---------change------------');
+					displayX(event); 
+				});
+				
+				es[i].addEventListener("mouseout", function(event){ 
+					console.log('-------restore-------');
+					reStyle(event); 
+				});
+	};
+//};
+
+var oldStyle = '';
+var target = '';
+function defvalue(att){
+	if(att == undefined){
+		return '';
+	}else{
+		return att;
+	}
+};
+
+function displayX(event){
+	var e = event || window.event;
+	target = e.target || e.srcElement;
+	console.log(target.innerHTML);
+	
+	var resJson = getX(e);
+	
+	oldStyle= target.style.border;
+	console.log(oldStyle);
+	target.style.border='3px solid red';
+	
+	var title = 'na';
+	title = window.document.title;
+	
+	var id = target.id;
+	var name = target.name;
+	var href = target.href;
+	var clss = target.className;
+	var value = target.value;
+	var txt = target.text;
+	var type= target.tagName;
+	var alias = 'na';
+	
+	/*
+	var maxsize = target.maxLength;
+	var outHtml = target.outerHTML;
+	var outText = target.outerText;
+	var ttype = target.type;
+	var nodeNm = target.nodeName;
+	var localNm = target.localName;
+	var isHidden = target.hidden;
+	var isDisabled = target.disabled;
+	var classNm = target.className;
+	var isAutoCmp = target.autocomplete;
+	var attrs = target.attributes;
+	var src = target.src;
+	var styles = target.style;
+	*/
+	
+	id = defvalue(id);
+	name = defvalue(name);
+	href = defvalue(href);
+	clss = defvalue(clss);
+	value = defvalue(value);
+	txt = defvalue(txt);
+	type = defvalue(type);
+
+	var framess = resJson['iFrameIdOrName'];
+	var xpath1= resJson['xpathEquals'];
+	var xpath2= resJson['firstXpath'];
+	var xpath3= resJson['xpathContains'];
+	
+	if(txt == '' || txt == undefined){
+		alias = type;
+	}else{
+		alias = txt;
+	}
+	
+	console.log("-------------CURRENT ELEMENT INFO-------------");
+	console.log("---title: "+ title);
+	console.log("---id: "+ id + ", name: " + name + ", type: " + type + ", class: " + clss);
+	console.log("---href: "+ href + ", value: " + value + ", text: " + txt + ', alias:' + alias);
+	console.log("---frame: " + framess );
+	console.log("---xpath1: " + xpath1);
+	console.log("---xpath2: " + xpath2);
+	console.log("---xpath3: " + xpath3);
+	
+	var data = {
+		act: 'elementInfo',
+		msg: {
+			title:title,
+			id: id, 
+			alias: alias, //元素名称
+			name: name,
+			href: href,
+			clss: clss,
+			value: value,
+			txt: txt,
+			type: type,
+			xpath1:xpath1,
+			xpath2:xpath2,
+			xpath3:xpath3,
+			framess:framess
+		}
+	};
+	window.top.postMessage(data, '*');
+	
+};
+
+function reStyle(event){
+	//var e = event || window.event;
+	//var target = e.target || e.srcElement;
+	target.style.border='';;
+};
+
+//document.ready=function(){
+			var es = document.getElementsByTagName("HLTYPE");
+			for (i = 0; i < es.length; i++) {
+				
+				es[i].addEventListener("mousemove", function(event){ 
+					console.log('---------change------------');
+					displayX(event); 
+				});
+				
+				es[i].addEventListener("mouseout", function(event){ 
+					console.log('-------restore-------');
+					reStyle(event); 
+				});
+	};
+//};
+
+
+  2019-06-06 14:13:29  [ main:11267 ] - [ INFO ]  sleep 3000...
+  2019-06-06 14:13:32  [ main:14290 ] - [ INFO ]  sleep 3000...
+  2019-06-06 14:13:35  [ main:17306 ] - [ INFO ]  sleep 3000...
+  2019-06-06 14:13:38  [ main:20328 ] - [ INFO ]  sleep 3000...
+  2019-06-06 14:13:41  [ main:23343 ] - [ INFO ]  sleep 3000...
+  2019-06-06 14:13:44  [ main:26360 ] - [ INFO ]  sleep 3000...
+  2019-06-06 14:13:47  [ main:29379 ] - [ INFO ]  sleep 3000...
+  2019-06-06 14:13:50  [ main:32398 ] - [ INFO ]  sleep 3000...
+  2019-06-06 14:13:53  [ main:35424 ] - [ INFO ]  sleep 3000...
+  2019-06-06 14:13:56  [ main:38441 ] - [ INFO ]  sleep 3000...
+  2019-06-06 14:13:59  [ main:41456 ] - [ INFO ]  sleep 3000...
+  2019-06-06 14:14:02  [ main:44479 ] - [ INFO ]  sleep 3000...
+  2019-06-06 14:14:05  [ main:47606 ] - [ INFO ]  sleep 3000...
+  2019-06-06 14:14:09  [ main:50631 ] - [ INFO ]  sleep 3000...
+  2019-06-06 14:14:12  [ main:53653 ] - [ INFO ]  sleep 3000...
+  2019-06-06 14:14:15  [ main:56679 ] - [ INFO ]  sleep 3000...
+  2019-06-06 14:14:18  [ main:59704 ] - [ INFO ]  sleep 3000...
+  2019-06-06 14:14:21  [ main:62791 ] - [ INFO ]  find frames ...0, iiframesNum: 0
+  2019-06-06 14:14:21  [ main:62792 ] - [ INFO ]  sleep 3000...
+  2019-06-06 14:14:24  [ main:65904 ] - [ INFO ]  find frames ...0, iiframesNum: 0
+  2019-06-06 14:14:24  [ main:65904 ] - [ INFO ]  sleep 3000...
+  2019-06-06 14:14:27  [ main:69003 ] - [ INFO ]  find frames ...0, iiframesNum: 0
+  2019-06-06 14:14:27  [ main:69003 ] - [ INFO ]  sleep 3000...
+  2019-06-06 14:14:30  [ main:72067 ] - [ INFO ]  find frames ...0, iiframesNum: 0
+  2019-06-06 14:14:30  [ main:72067 ] - [ INFO ]  sleep 3000...
+  2019-06-06 14:14:33  [ main:75126 ] - [ INFO ]  find frames ...0, iiframesNum: 0
+  2019-06-06 14:14:33  [ main:75126 ] - [ INFO ]  sleep 3000...
+  2019-06-06 14:14:36  [ main:78183 ] - [ INFO ]  find frames ...0, iiframesNum: 0
+  2019-06-06 14:14:36  [ main:78183 ] - [ INFO ]  sleep 3000...
+  2019-06-06 14:14:39  [ main:81247 ] - [ INFO ]  find frames ...0, iiframesNum: 0
+  2019-06-06 14:14:39  [ main:81247 ] - [ INFO ]  sleep 3000...
+  2019-06-06 14:14:42  [ main:84331 ] - [ INFO ]  find frames ...0, iiframesNum: 0
+  2019-06-06 14:14:42  [ main:84331 ] - [ INFO ]  sleep 3000...
+  2019-06-06 14:14:45  [ main:87391 ] - [ INFO ]  find frames ...0, iiframesNum: 0
+  2019-06-06 14:14:45  [ main:87392 ] - [ INFO ]  sleep 3000...
+  2019-06-06 14:14:48  [ main:90509 ] - [ INFO ]  find frames ...0, iiframesNum: 0
+  2019-06-06 14:14:48  [ main:90510 ] - [ INFO ]  sleep 3000...
+  2019-06-06 14:14:51  [ main:93592 ] - [ INFO ]  find frames ...0, iiframesNum: 0
+  2019-06-06 14:14:51  [ main:93592 ] - [ INFO ]  sleep 3000...
+  2019-06-06 14:14:55  [ main:96651 ] - [ INFO ]  find frames ...0, iiframesNum: 0
+  2019-06-06 14:14:55  [ main:96651 ] - [ INFO ]  sleep 3000...
+  2019-06-06 14:14:58  [ main:99720 ] - [ INFO ]  find frames ...0, iiframesNum: 0
+  2019-06-06 14:14:58  [ main:99720 ] - [ INFO ]  sleep 3000...
+  2019-06-06 14:15:01  [ main:102791 ] - [ INFO ]  find frames ...0, iiframesNum: 0
+  2019-06-06 14:15:01  [ main:102791 ] - [ INFO ]  sleep 3000...
+  2019-06-06 14:15:04  [ main:105855 ] - [ INFO ]  find frames ...0, iiframesNum: 0
+  2019-06-06 14:15:04  [ main:105856 ] - [ INFO ]  sleep 3000...
+  2019-06-06 14:15:07  [ main:108915 ] - [ INFO ]  find frames ...0, iiframesNum: 0
+  2019-06-06 14:15:07  [ main:108915 ] - [ INFO ]  sleep 3000...
+  2019-06-06 14:15:10  [ main:111972 ] - [ INFO ]  find frames ...0, iiframesNum: 0
+  2019-06-06 14:15:10  [ main:111972 ] - [ INFO ]  sleep 3000...
+  2019-06-06 14:15:13  [ main:115029 ] - [ INFO ]  find frames ...0, iiframesNum: 0
+  2019-06-06 14:15:13  [ main:115030 ] - [ INFO ]  sleep 3000...
+  2019-06-06 14:15:16  [ main:118095 ] - [ INFO ]  find frames ...0, iiframesNum: 0
+  2019-06-06 14:15:16  [ main:118095 ] - [ INFO ]  sleep 3000...
+  2019-06-06 14:15:19  [ main:121152 ] - [ INFO ]  find frames ...0, iiframesNum: 0
+  2019-06-06 14:15:19  [ main:121152 ] - [ INFO ]  sleep 3000...
+  2019-06-06 14:15:22  [ main:124215 ] - [ INFO ]  find frames ...0, iiframesNum: 0
+  2019-06-06 14:15:22  [ main:124215 ] - [ INFO ]  sleep 3000...
+  2019-06-06 14:15:25  [ main:127281 ] - [ INFO ]  find frames ...0, iiframesNum: 0
+  2019-06-06 14:15:25  [ main:127281 ] - [ INFO ]  sleep 3000...
+  2019-06-06 14:15:28  [ main:130342 ] - [ INFO ]  find frames ...0, iiframesNum: 0
+  2019-06-06 14:15:28  [ main:130342 ] - [ INFO ]  sleep 3000...
+  2019-06-06 14:15:31  [ main:133397 ] - [ INFO ]  find frames ...0, iiframesNum: 0
+  2019-06-06 14:15:31  [ main:133397 ] - [ INFO ]  sleep 3000...
+  2019-06-06 14:15:34  [ main:136457 ] - [ INFO ]  find frames ...0, iiframesNum: 0
+  2019-06-06 14:15:34  [ main:136457 ] - [ INFO ]  sleep 3000...
+  2019-06-06 14:15:37  [ main:139528 ] - [ INFO ]  find frames ...0, iiframesNum: 0
+  2019-06-06 14:15:37  [ main:139528 ] - [ INFO ]  sleep 3000...
+  2019-06-06 14:15:40  [ main:142609 ] - [ INFO ]  find frames ...0, iiframesNum: 0
+  2019-06-06 14:15:40  [ main:142609 ] - [ INFO ]  sleep 3000...
+  2019-06-06 14:15:44  [ main:145668 ] - [ INFO ]  find frames ...0, iiframesNum: 0
+  2019-06-06 14:15:44  [ main:145669 ] - [ INFO ]  sleep 3000...
+  2019-06-06 14:15:47  [ main:148726 ] - [ INFO ]  find frames ...0, iiframesNum: 0
+  2019-06-06 14:15:47  [ main:148726 ] - [ INFO ]  sleep 3000...
+  2019-06-06 14:15:50  [ main:151787 ] - [ INFO ]  find frames ...0, iiframesNum: 0
+  2019-06-06 14:15:50  [ main:151787 ] - [ INFO ]  sleep 3000...
+  2019-06-06 14:15:53  [ main:154844 ] - [ INFO ]  find frames ...0, iiframesNum: 0
+  2019-06-06 14:15:53  [ main:154844 ] - [ INFO ]  sleep 3000...
+  2019-06-06 14:15:56  [ main:157913 ] - [ INFO ]  find frames ...0, iiframesNum: 0
+  2019-06-06 14:15:56  [ main:157913 ] - [ INFO ]  sleep 3000...
+  2019-06-06 14:15:59  [ main:161050 ] - [ INFO ]  find frames ...0, iiframesNum: 0
+  2019-06-06 14:15:59  [ main:161050 ] - [ INFO ]  sleep 3000...
+  2019-06-06 14:16:02  [ main:164139 ] - [ INFO ]  find frames ...0, iiframesNum: 0
+  2019-06-06 14:16:02  [ main:164140 ] - [ INFO ]  sleep 3000...
+  2019-06-06 14:16:05  [ main:167210 ] - [ INFO ]  find frames ...0, iiframesNum: 0
+  2019-06-06 14:16:05  [ main:167210 ] - [ INFO ]  sleep 3000...
+  2019-06-06 14:16:08  [ main:170299 ] - [ INFO ]  find frames ...0, iiframesNum: 0
+  2019-06-06 14:16:08  [ main:170300 ] - [ INFO ]  sleep 3000...
+  2019-06-06 14:16:11  [ main:173358 ] - [ INFO ]  find frames ...0, iiframesNum: 0
+  2019-06-06 14:16:11  [ main:173358 ] - [ INFO ]  sleep 3000...
+  2019-06-06 14:16:14  [ main:176422 ] - [ INFO ]  find frames ...0, iiframesNum: 0
+  2019-06-06 14:16:14  [ main:176422 ] - [ INFO ]  sleep 3000...
+  2019-06-06 14:16:17  [ main:179478 ] - [ INFO ]  find frames ...0, iiframesNum: 0
+  2019-06-06 14:16:17  [ main:179478 ] - [ INFO ]  sleep 3000...
+  2019-06-06 14:16:20  [ main:182539 ] - [ INFO ]  find frames ...0, iiframesNum: 0
+  2019-06-06 14:16:20  [ main:182539 ] - [ INFO ]  sleep 3000...
+  2019-06-06 14:16:23  [ main:185603 ] - [ INFO ]  find frames ...0, iiframesNum: 0
+  2019-06-06 14:16:23  [ main:185603 ] - [ INFO ]  sleep 3000...
+  2019-06-06 14:16:27  [ main:188679 ] - [ INFO ]  find frames ...0, iiframesNum: 0
+  2019-06-06 14:16:27  [ main:188679 ] - [ INFO ]  sleep 3000...
+  2019-06-06 14:16:30  [ main:191737 ] - [ INFO ]  find frames ...0, iiframesNum: 0
+  2019-06-06 14:16:30  [ main:191737 ] - [ INFO ]  sleep 3000...
+  2019-06-06 14:16:33  [ main:194795 ] - [ INFO ]  find frames ...0, iiframesNum: 0
+  2019-06-06 14:16:33  [ main:194795 ] - [ INFO ]  sleep 3000...
+  2019-06-06 14:16:36  [ main:197855 ] - [ INFO ]  find frames ...0, iiframesNum: 0
+  2019-06-06 14:16:36  [ main:197855 ] - [ INFO ]  sleep 3000...
+  2019-06-06 14:16:39  [ main:200923 ] - [ INFO ]  find frames ...0, iiframesNum: 0
+  2019-06-06 14:16:39  [ main:200924 ] - [ INFO ]  sleep 3000...
+  2019-06-06 14:16:42  [ main:204034 ] - [ INFO ]  find frames ...0, iiframesNum: 0
+  2019-06-06 14:16:42  [ main:204034 ] - [ INFO ]  sleep 3000...
+  2019-06-06 14:16:45  [ main:207103 ] - [ INFO ]  find frames ...0, iiframesNum: 0
+  2019-06-06 14:16:45  [ main:207103 ] - [ INFO ]  sleep 3000...
+  2019-06-06 14:16:48  [ main:210161 ] - [ INFO ]  find frames ...0, iiframesNum: 0
+  2019-06-06 14:16:48  [ main:210161 ] - [ INFO ]  sleep 3000...
+  2019-06-06 14:16:51  [ main:213234 ] - [ INFO ]  find frames ...0, iiframesNum: 0
+  2019-06-06 14:16:51  [ main:213234 ] - [ INFO ]  sleep 3000...
+  2019-06-06 14:16:54  [ main:216294 ] - [ INFO ]  find frames ...0, iiframesNum: 0
+  2019-06-06 14:16:54  [ main:216294 ] - [ INFO ]  sleep 3000...
+  2019-06-06 14:16:57  [ main:219494 ] - [ INFO ]  find frames ...0, iiframesNum: 0
+  2019-06-06 14:16:57  [ main:219494 ] - [ INFO ]  sleep 3000...
+  2019-06-06 14:17:00  [ main:222562 ] - [ INFO ]  find frames ...0, iiframesNum: 0
+  2019-06-06 14:17:00  [ main:222562 ] - [ INFO ]  sleep 3000...
+  2019-06-06 14:17:04  [ main:225619 ] - [ INFO ]  find frames ...0, iiframesNum: 0
+  2019-06-06 14:17:04  [ main:225619 ] - [ INFO ]  sleep 3000...
+  2019-06-06 14:17:07  [ main:228690 ] - [ INFO ]  find frames ...0, iiframesNum: 0
+  2019-06-06 14:17:07  [ main:228690 ] - [ INFO ]  sleep 3000...
+  2019-06-06 14:17:10  [ main:231746 ] - [ INFO ]  find frames ...0, iiframesNum: 0
+  2019-06-06 14:17:10  [ main:231746 ] - [ INFO ]  sleep 3000...
+  2019-06-06 14:17:13  [ main:234808 ] - [ INFO ]  find frames ...0, iiframesNum: 0
+  2019-06-06 14:17:13  [ main:234808 ] - [ INFO ]  sleep 3000...
+  2019-06-06 14:17:16  [ main:237865 ] - [ INFO ]  find frames ...0, iiframesNum: 0
+  2019-06-06 14:17:16  [ main:237865 ] - [ INFO ]  sleep 3000...
+  2019-06-06 14:17:19  [ main:240929 ] - [ INFO ]  find frames ...0, iiframesNum: 0
+  2019-06-06 14:17:19  [ main:240929 ] - [ INFO ]  sleep 3000...
+  2019-06-06 14:17:22  [ main:243979 ] - [ INFO ]  find frames ...0, iiframesNum: 0
+  2019-06-06 14:17:22  [ main:243979 ] - [ INFO ]  sleep 3000...
+  2019-06-06 14:17:25  [ main:247035 ] - [ INFO ]  find frames ...0, iiframesNum: 0
+  2019-06-06 14:17:25  [ main:247035 ] - [ INFO ]  sleep 3000...
+  2019-06-06 14:17:28  [ main:250097 ] - [ INFO ]  find frames ...0, iiframesNum: 0
+  2019-06-06 14:17:28  [ main:250097 ] - [ INFO ]  sleep 3000...
+  2019-06-06 14:17:31  [ main:253154 ] - [ INFO ]  find frames ...0, iiframesNum: 0
+  2019-06-06 14:17:31  [ main:253154 ] - [ INFO ]  sleep 3000...
+  2019-06-06 14:17:34  [ main:256215 ] - [ INFO ]  find frames ...0, iiframesNum: 0
+  2019-06-06 14:17:34  [ main:256215 ] - [ INFO ]  sleep 3000...
+  2019-06-06 14:17:37  [ main:259293 ] - [ INFO ]  find frames ...0, iiframesNum: 0
+  2019-06-06 14:17:37  [ main:259293 ] - [ INFO ]  sleep 3000...
+  2019-06-06 14:17:40  [ main:262349 ] - [ INFO ]  find frames ...0, iiframesNum: 0
+  2019-06-06 14:17:40  [ main:262349 ] - [ INFO ]  sleep 3000...
+  2019-06-06 14:17:43  [ main:265431 ] - [ INFO ]  find frames ...0, iiframesNum: 0
+  2019-06-06 14:17:43  [ main:265431 ] - [ INFO ]  sleep 3000...
+  2019-06-06 14:17:46  [ main:268487 ] - [ INFO ]  find frames ...0, iiframesNum: 0
+  2019-06-06 14:17:46  [ main:268487 ] - [ INFO ]  sleep 3000...
+  2019-06-06 14:17:49  [ main:271545 ] - [ INFO ]  find frames ...0, iiframesNum: 0
+  2019-06-06 14:17:49  [ main:271545 ] - [ INFO ]  sleep 3000...
+  2019-06-06 14:17:52  [ main:274599 ] - [ INFO ]  find frames ...0, iiframesNum: 0
+  2019-06-06 14:17:52  [ main:274599 ] - [ INFO ]  sleep 3000...
+  2019-06-06 14:17:56  [ main:277657 ] - [ INFO ]  find frames ...0, iiframesNum: 0
+  2019-06-06 14:17:56  [ main:277657 ] - [ INFO ]  sleep 3000...
+  2019-06-06 14:17:59  [ main:280712 ] - [ INFO ]  find frames ...0, iiframesNum: 0
+  2019-06-06 14:17:59  [ main:280712 ] - [ INFO ]  sleep 3000...
+  2019-06-06 14:18:02  [ main:283769 ] - [ INFO ]  find frames ...0, iiframesNum: 0
+  2019-06-06 14:18:02  [ main:283770 ] - [ INFO ]  sleep 3000...
+  2019-06-06 14:18:05  [ main:286829 ] - [ INFO ]  find frames ...0, iiframesNum: 0
+  2019-06-06 14:18:05  [ main:286829 ] - [ INFO ]  sleep 3000...
+  2019-06-06 14:18:08  [ main:289893 ] - [ INFO ]  find frames ...0, iiframesNum: 0
+  2019-06-06 14:18:08  [ main:289893 ] - [ INFO ]  sleep 3000...
+  2019-06-06 14:18:11  [ main:292949 ] - [ INFO ]  find frames ...0, iiframesNum: 0
+  2019-06-06 14:18:11  [ main:292949 ] - [ INFO ]  sleep 3000...
+  2019-06-06 14:18:14  [ main:296004 ] - [ INFO ]  find frames ...0, iiframesNum: 0
+  2019-06-06 14:18:14  [ main:296004 ] - [ INFO ]  sleep 3000...
+  2019-06-06 14:18:17  [ main:299070 ] - [ INFO ]  find frames ...0, iiframesNum: 0
+  2019-06-06 14:18:17  [ main:299070 ] - [ INFO ]  sleep 3000...
+  2019-06-06 14:18:20  [ main:302134 ] - [ INFO ]  find frames ...0, iiframesNum: 0
+  2019-06-06 14:18:20  [ main:302134 ] - [ INFO ]  sleep 3000...
+  2019-06-06 14:18:23  [ main:305199 ] - [ INFO ]  find frames ...0, iiframesNum: 0
+  2019-06-06 14:18:23  [ main:305199 ] - [ INFO ]  sleep 3000...
+  2019-06-06 14:18:26  [ main:308255 ] - [ INFO ]  find frames ...0, iiframesNum: 0
+  2019-06-06 14:18:26  [ main:308255 ] - [ INFO ]  sleep 3000...
+  2019-06-06 14:18:29  [ main:311329 ] - [ INFO ]  find frames ...0, iiframesNum: 0
+  2019-06-06 14:18:29  [ main:311329 ] - [ INFO ]  sleep 3000...
+  2019-06-06 14:18:33  [ main:314795 ] - [ INFO ]  find frames ...0, iiframesNum: 0
+  2019-06-06 14:18:33  [ main:314795 ] - [ INFO ]  sleep 3000...
+  2019-06-06 14:18:36  [ main:318120 ] - [ INFO ]  find frames ...0, iiframesNum: 0
+  2019-06-06 14:18:36  [ main:318120 ] - [ INFO ]  sleep 3000...
+  2019-06-06 14:18:39  [ main:321288 ] - [ INFO ]  find frames ...0, iiframesNum: 0
+  2019-06-06 14:18:39  [ main:321288 ] - [ INFO ]  sleep 3000...
+  2019-06-06 14:18:42  [ main:324345 ] - [ INFO ]  find frames ...0, iiframesNum: 0
+  2019-06-06 14:18:42  [ main:324345 ] - [ INFO ]  sleep 3000...
+  2019-06-06 14:18:45  [ main:327437 ] - [ INFO ]  find frames ...0, iiframesNum: 0
+  2019-06-06 14:18:45  [ main:327437 ] - [ INFO ]  sleep 3000...
+  2019-06-06 14:18:48  [ main:330528 ] - [ INFO ]  find frames ...0, iiframesNum: 0
+  2019-06-06 14:18:48  [ main:330529 ] - [ INFO ]  sleep 3000...
+  2019-06-06 14:18:51  [ main:333587 ] - [ INFO ]  find frames ...0, iiframesNum: 0
+  2019-06-06 14:18:51  [ main:333587 ] - [ INFO ]  sleep 3000...
+  2019-06-06 14:18:55  [ main:336651 ] - [ INFO ]  find frames ...0, iiframesNum: 0
+  2019-06-06 14:18:55  [ main:336651 ] - [ INFO ]  sleep 3000...
+  2019-06-06 14:18:58  [ main:339701 ] - [ INFO ]  find frames ...0, iiframesNum: 0
+  2019-06-06 14:18:58  [ main:339701 ] - [ INFO ]  sleep 3000...
+  2019-06-06 14:19:01  [ main:342759 ] - [ INFO ]  find frames ...0, iiframesNum: 0
+  2019-06-06 14:19:01  [ main:342759 ] - [ INFO ]  sleep 3000...
+  2019-06-06 14:19:04  [ main:345900 ] - [ INFO ]  find frames ...0, iiframesNum: 0
+  2019-06-06 14:19:04  [ main:345900 ] - [ INFO ]  sleep 3000...
+  
