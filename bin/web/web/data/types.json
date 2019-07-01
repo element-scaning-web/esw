@@ -2,5 +2,7 @@
 {"tagid":"INPUT","tagname":"输入框"},
 {"tagid":"BUTTON","tagname":"按钮"},
 {"tagid":"TABLE","tagname":"表格"},
-{"tagid ":"SELECT","tagname":"下拉框"}
+{"tagid ":"SELECT","tagname":"下拉框"},
+{"tagid ":"A","tagname":"链接"},
+{"tagid ":"CHECKBOX","tagname":"复选框"}
 ]

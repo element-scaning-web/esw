@@ -11,12 +11,12 @@ function defvalue(att){
 function displayX(event){
 	var e = event || window.event;
 	target = e.target || e.srcElement;
-	console.log(target.innerHTML);
+	//console.log(target.innerHTML);
 	
 	var resJson = getX(e);
 	
 	oldStyle= target.style.border;
-	console.log(oldStyle);
+	//console.log(oldStyle);
 	target.style.border='3px solid red';
 	
 	var title = 'na';
@@ -67,10 +67,10 @@ function displayX(event){
 	}
 	
 	console.log("-------------CURRENT ELEMENT INFO-------------");
-	console.log("---title: "+ title);
-	console.log("---id: "+ id + ", name: " + name + ", type: " + type + ", class: " + clss);
-	console.log("---href: "+ href + ", value: " + value + ", text: " + txt + ', alias:' + alias);
-	console.log("---frame: " + framess );
+	//console.log("---title: "+ title);
+	//console.log("---id: "+ id + ", name: " + name + ", type: " + type + ", class: " + clss);
+	//console.log("---href: "+ href + ", value: " + value + ", text: " + txt + ', alias:' + alias);
+	//console.log("---frame: " + framess );
 	console.log("---xpath1: " + xpath1);
 	console.log("---xpath2: " + xpath2);
 	console.log("---xpath3: " + xpath3);
@@ -97,6 +97,21 @@ function displayX(event){
 	
 };
 
+function rightAddElement(event){
+	var btnNum = event.button;
+	if (btnNum==2){
+		console.log("add");
+		//append();
+		var data = {
+		act: 'rightAddElement',
+		msg: {
+		}
+	};
+	window.top.postMessage(data, '*');
+	}
+}
+
+
 function reStyle(event){
 	//var e = event || window.event;
 	//var target = e.target || e.srcElement;
@@ -110,6 +125,9 @@ function reStyle(event){
 				es[i].addEventListener("mousemove", function(event){ 
 					console.log('---------change------------');
 					displayX(event); 
+					
+					console.log('---------rightAddElement------------');
+					rightAddElement(event);
 				});
 				
 				es[i].addEventListener("mouseout", function(event){ 

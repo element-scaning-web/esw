@@ -1,0 +1,37 @@
+2019-06-21 15:22:44  [ main:0 ] - [ WARN ]  no find key 'browser' in configuration file 'E:\esa\esw\bin\web/config.properties' , use default value 
+  2019-06-21 15:22:44  [ main:1 ] - [ WARN ]  no find key 'defUrl' in configuration file 'E:\esa\esw\bin\web/config.properties' , use default value 
+  2019-06-21 15:22:44  [ main:1 ] - [ WARN ]  no find key 'types' in configuration file 'E:\esa\esw\bin\web/config.properties' , use default value 
+  2019-06-21 15:22:44  [ main:1 ] - [ WARN ]  no find key 'jqCdn' in configuration file 'E:\esa\esw\bin\web/config.properties' , use default value 
+  2019-06-21 15:22:44  [ main:1 ] - [ WARN ]  no find key 'title' in configuration file 'E:\esa\esw\bin\web/config.properties' , use default value 
+  2019-06-21 15:22:44  [ main:1 ] - [ WARN ]  no find key 'collectInterval' in configuration file 'E:\esa\esw\bin\web/config.properties' , use default value 
+  2019-06-21 15:22:44  [ main:10 ] - [ ERROR ]  找不到指定的文件E:\esa\esw\bin\web/model.js
+  2019-06-21 15:22:44  [ main:11 ] - [ ERROR ]  找不到指定的文件E:\esa\esw\bin\web/model/getX.js
+  2019-06-21 15:22:44  [ main:11 ] - [ INFO ]  basePath:E:\esa\esw\bin\web 
+  2019-06-21 15:22:44  [ main:11 ] - [ INFO ]  model: 
+  2019-06-21 15:22:44  [ main:11 ] - [ INFO ]  chromeDriverPath:E:\esa\esw\bin\web/driver/chromedriver.exe 
+  2019-06-21 15:22:44  [ main:11 ] - [ INFO ]  ieDriverPath:E:\esa\esw\bin\web/driver/chromedriver.exe 
+  2019-06-21 15:22:44  [ main:11 ] - [ INFO ]  browser:null 
+  2019-06-21 15:22:44  [ main:11 ] - [ INFO ]  defUrl:http://libs.baidu.com/jquery/2.1.1/jquery.min.js 
+  2019-06-21 15:22:44  [ main:11 ] - [ INFO ]  types:null 
+  2019-06-21 15:22:44  [ main:11 ] - [ INFO ]  jqCdn:null 
+  2019-06-21 15:22:44  [ main:11 ] - [ INFO ]  title:oneKey 
+  2019-06-21 15:22:44  [ main:12 ] - [ INFO ]  collectInt:3000 
+  2019-06-21 15:23:53  [ main:0 ] - [ WARN ]  no find key 'browser' in configuration file 'E:\esa\esw\bin\web/config.properties' , use default value 
+  2019-06-21 15:23:53  [ main:1 ] - [ WARN ]  no find key 'defUrl' in configuration file 'E:\esa\esw\bin\web/config.properties' , use default value 
+  2019-06-21 15:23:53  [ main:1 ] - [ WARN ]  no find key 'types' in configuration file 'E:\esa\esw\bin\web/config.properties' , use default value 
+  2019-06-21 15:23:53  [ main:1 ] - [ WARN ]  no find key 'jqCdn' in configuration file 'E:\esa\esw\bin\web/config.properties' , use default value 
+  2019-06-21 15:23:53  [ main:1 ] - [ WARN ]  no find key 'title' in configuration file 'E:\esa\esw\bin\web/config.properties' , use default value 
+  2019-06-21 15:23:53  [ main:1 ] - [ WARN ]  no find key 'collectInterval' in configuration file 'E:\esa\esw\bin\web/config.properties' , use default value 
+  2019-06-21 15:23:53  [ main:10 ] - [ ERROR ]  找不到指定的文件E:\esa\esw\bin\web/model.js
+  2019-06-21 15:23:53  [ main:11 ] - [ ERROR ]  找不到指定的文件E:\esa\esw\bin\web/model/getX.js
+  2019-06-21 15:23:53  [ main:11 ] - [ INFO ]  basePath:E:\esa\esw\bin\web 
+  2019-06-21 15:23:53  [ main:11 ] - [ INFO ]  model: 
+  2019-06-21 15:23:53  [ main:11 ] - [ INFO ]  chromeDriverPath:E:\esa\esw\bin\web/driver/chromedriver.exe 
+  2019-06-21 15:23:53  [ main:11 ] - [ INFO ]  ieDriverPath:E:\esa\esw\bin\web/driver/chromedriver.exe 
+  2019-06-21 15:23:53  [ main:11 ] - [ INFO ]  browser:null 
+  2019-06-21 15:23:53  [ main:11 ] - [ INFO ]  defUrl:http://libs.baidu.com/jquery/2.1.1/jquery.min.js 
+  2019-06-21 15:23:53  [ main:11 ] - [ INFO ]  types:null 
+  2019-06-21 15:23:53  [ main:11 ] - [ INFO ]  jqCdn:null 
+  2019-06-21 15:23:53  [ main:11 ] - [ INFO ]  title:oneKey 
+  2019-06-21 15:23:53  [ main:11 ] - [ INFO ]  collectInt:3000 
+  

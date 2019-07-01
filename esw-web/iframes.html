@@ -21,6 +21,9 @@
     </style>
 <!-- <script src="common/jquery.js" type="text/javascript"></script> -->
 <script type="text/javascript">
+
+//location=null//或者 location=""
+
 function GetQueryString(name){
      var reg = new RegExp("(^|&)"+ name +"=([^&]*)(&|$)");
      var r = window.location.search.substr(1).match(reg);
@@ -42,54 +45,18 @@ window.addEventListener('message', function(e){
 		};
 		window.frames[0].postMessage(data,'*');
 		console.log("已发送,types:" + types)
-    } //else {
-		//console.log('未定义的消息: '+ e.data.act);
-    //}
-}, false);
-
-window.addEventListener('message', function(e){
-	//console.log("-------------" +  e.data.act + "-------------");
+    };
+	
+	//批量显示元素信息
 	if (e.data.act == 'resultElementInfo') {
 		var result = e.data.msg.result;
-		console.log('result: '+ result);
 		$("#elementInfoList").datagrid("loadData", {total : 0, rows : []}); 
-		for(var i=0;i<result.length;i++){
-			console.log('------------- INFO -------------' );
-			/*console.log(result[i].elementNm);
-			console.log(result[i].xpathEquals);
-			console.log(result[i].firstXpath);
-			console.log(result[i].xpathContains);
-			console.log(result[i].iFrameUrl);
-			console.log(result[i].isInIFrameFlag);
-			*/
-			for (var item in result[i]) {
-				console.log('key: ' + item + ',  value: ' + result[i][item]);				
-			}
-		}
-		
 		$("#elementInfoList").datagrid("loadData", result); 
-
-
-    } //else {
-		//console.log('未定义的消息: '+ e.data.act);
-    //}
-}, false);
-
-
-window.addEventListener('message', function(e){
-	//console.log("-------------" +  e.data.act + "-------------");
+    };
+	
+	//显示元素信息
 	if (e.data.act == 'elementInfo') {
 		console.log("-------------GET ELEMENT INFO-------------")
-		/*console.log("---title: "+ e.data.msg.title);
-		console.log("---id: "+ e.data.msg.id + ", name: " + e.data.msg.name + ", type: " + e.data.msg.type + ", class: " + e.data.msg.clss);
-		console.log("---href: "+ e.data.msg.href + ", value: " + e.data.msg.value + ", text: " + e.data.msg.txt + ', frame:' + e.data.msg.framess);
-		console.log("---frames: " + e.data.msg.framess);
-		console.log("---xpath1: "+ e.data.msg.xpath1);
-		console.log("---xpath2: "+ e.data.msg.xpath2);
-		console.log("---xpath3: "+ e.data.msg.xpath3);
-		console.log("---alias: "+ e.data.msg.alias);
-		*/
-
 		$("#currElementPage").textbox('setValue',e.data.msg.title + '_Page');
 		$("#currElementAlias").textbox('setValue',e.data.msg.alias);
 		$("#currElementId").textbox('setValue',e.data.msg.id);
@@ -103,38 +70,21 @@ window.addEventListener('message', function(e){
 		$("#currElementXpath1").textbox('setValue',e.data.msg.xpath1);
 		$("#currElementXpath2").textbox('setValue',e.data.msg.xpath2);
 		$("#currElementXpath3").textbox('setValue',e.data.msg.xpath3);
-
-		/*
-		$(window.frames["elementInfo"].document).find("#currElementPage").val(e.data.msg.title);
-		$(window.frames["elementInfo"].document).find("#currElementAlias").val(e.data.msg.title + "_Page");
-		$(window.frames["elementInfo"].document).find("#currElementId").val(e.data.msg.id);
-		$(window.frames["elementInfo"].document).find("#currElementName").val(e.data.msg.name);
-		$(window.frames["elementInfo"].document).find("#currElementTagName").val(e.data.msg.type);
-		$(window.frames["elementInfo"].document).find("#currElementText").val(e.data.msg.txt);
-		$(window.frames["elementInfo"].document).find("#currElementValue").val(e.data.msg.value);
-		$(window.frames["elementInfo"].document).find("#currElementClass").val(e.data.msg.clss);
-		$(window.frames["elementInfo"].document).find("#currElementHref").val(e.data.msg.href);
-		$(window.frames["elementInfo"].document).find("#currElementFrames").val(e.data.msg.framess);
-		$(window.frames["elementInfo"].document).find("#currElementXpath1").val(e.data.msg.xpath1);
-		$(window.frames["elementInfo"].document).find("#currElementXpath2").val(e.data.msg.xpath2);
-		$(window.frames["elementInfo"].document).find("#currElementXpath3").val(e.data.msg.xpath3);
-		*/
-
-		
-       /* window.parent.postMessage({ 
-            act: 'response', 
-            msg: {answer: '我接收到啦！'}
-        }, '*');*/
-    } //else {
-		//console.log('未定义的消息: '+ e.data.act);
-    //}
+    };
+	
+	//右键添加元素
+	if (e.data.act == 'rightAddElement') {
+		console.log('rev add');
+		append();
+    };
+	
 }, false);
 
 </script>
 </head>
 <body>
 <div class="easyui-layout" style="width:96%;height:98%">
-		<div id="elementInfoId" name="elementInfo" data-options="region:'west',split:true,collapsible:true" title="ELEMENT INFO" style="width:30%;padding:10px" href="http://10.202.2.80/elementInfo.html" >
+		<div id="elementInfoId" name="elementInfo" data-options="region:'west',split:true,collapsible:true" title="ELEMENT INFO" style="width:30%;padding:10px" href="http://127.0.0.1:8081/elementInfo.html" >
 		</div>
 		
 		<!--<div data-options="region:'west',split:true,collapsible:true" style="width:30%;padding:10px" title="ELEMENT INFO" >
@@ -142,7 +92,8 @@ window.addEventListener('message', function(e){
 		</div>-->
 		<!--<div id="mainPageId" name="mainPage" data-options="region:'center'" title="TEST PAGE" href="http://www.baidu.com"> -->
 		<div data-options="region:'center'" title="TEST PAGE" >
-			<iframe src="" style="width:100%;height:98%;" id="mainPageId" name="mainPage" noresize="noresize" marginwidth="0" marginheight="0" frameborder="0" target="_self"></iframe>
+			<iframe src="" style="width:100%;height:98%;" id="mainPageId" name="mainPage" noresize="noresize" marginwidth="0" marginheight="0" 
+			frameborder="0" target="_self"></iframe>
 		</div>
 </div>
 
