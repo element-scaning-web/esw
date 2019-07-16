@@ -1,3 +1,5 @@
+const SQL = require('./db/SQL.js');
+
 var express = require("express");
 var nodeCmd = require('node-cmd');
 var path = require('path');
@@ -7,6 +9,7 @@ var URL =require('url');
 var qs =require('querystring'); 
 var bodyParser = require("body-parser");  
 var db = require("./db/mysql.js"); 
+var nodeCmd = require('node-cmd');
 
 
 
@@ -36,9 +39,10 @@ app.get('/', function (req, res) {
   )
 })
 
+
 //获取项目
 app.get('/projects', function (req, res) {
-  var projectsql = 'select id,project_name from atp_project';
+  var projectsql = SQL.SQLProject;
   console.log("sql= "+projectsql);
   
   (async ()=>{
@@ -64,11 +68,13 @@ app.get('/pages', function (req, res) {
 	}
 	console.log("project id: " + pid.toString());
 	
-	var sqlPage = 'select id,page_name from atp_page where project_id=' + pid;
-	console.log("sql= "+sqlPage);
+	//var sqlPage = 'select id,page_name from atp_page where project_id=' + pid;
+	var sqlPage = SQL.SQLPage;
+	var params = [pid];
+	console.log("sql= "+sqlPage + ', params=' + params);
 	
 	(async ()=>{
-		let results = await db.query2(sqlPage);
+		let results = await db.query2(sqlPage,params);
 		if (results.length >= 1){
 			res.send(results);
 			/*for(var r=0;r<results.length;r++){
@@ -109,14 +115,18 @@ app.post('/page', urlencodedParser,function (req, res) {
 		return false;
 	}
 	
-	var addPageSql = " insert into1 atp_page" +
+	var addPageSql = " insert into atp_page" +
 					"(page_name,page_desc,project_id,project_name,create_time,create_emp,delete_flag) "  +
 					" VALUES('" + pgNm  + "','" + pgNm + " desc','" + pid +"','" + pNm + "',now(),'third','0')";
-	console.log("sql= "+addPageSql);
+	
+	//var addPageSql = SQL.SQLAddPage;
+	//var params = ["'" + pgNm  + "'","'" + pgNm + " desc'","'" + pid +"'","'" + pNm + "'",'now()',"'third'","'0'"];
+	console.log("sql= " + addPageSql + ", params=" + params);
 	
 	(async ()=>{
 		try {
-			let results = await db.query2(addPageSql);
+			//let results = await db.query2(addPageSql);
+			let results = await db.query2(addPageSql,params);
 			res.send("{ result: 'success', msg: 'add success' }");
 		}catch(e){
 			res.send("{ result: 'fail', msg: '" + e + "' }");
@@ -137,14 +147,17 @@ app.get('/elements', function (req, res) {
 	}
 	console.log("page id: " + pgid.toString());
 
-    var sqlElements = 'select id,element_name,element_value,element_frame,element_index, ' + 
+   /* var sqlElements = 'select id,element_name,element_value,element_frame,element_index, ' + 
 	'(select type_name from omg_fsp_dict_data where type_class_code = "ELEMENT_FINDER_TYPE" and type_id = element_type) as element_finder, ' +
 	'(select type_name from omg_fsp_dict_data where type_class_code = "ELEMENT_TYPE" and type_id = element_type) as element_type ' +
-	' from atp_element where page_id=' + pgid ;
-	console.log("sql= "+sqlElements);
+	' from atp_element where page_id=' + pgid ;*/
+	
+	var sqlElements = SQL.SQLElements;
+	var params = [pgid];
+	console.log("sql= "+sqlElements + ", params=" + params);
 	
 	(async ()=>{
-		let results = await db.query2(sqlElements);
+		let results = await db.query2(sqlElements,params);
 		if (results.length >= 1){
 			res.send(results);
 			//res.end(results);
@@ -155,118 +168,13 @@ app.get('/elements', function (req, res) {
 
 })
 
-function addOrUpdateOneElment(e,t,res){
-	var pgId = e.pageId;
-	var eNm = e.elementName;
-	var eType=e.elementType;
-	var eFinder=e.elementFinder;
-	var eValue=e.elementValue;
-	var eFrame=e.elementFrame;
-	var eIndex=e.elementIndex;
-	var ctime='now()';
-	var cemp='third';
-	var deleteFlag='0';
-
-	console.log('pgId:'+pgId)
-	if(pgId == undefined || pgId == ''){
-		res.send('page id 不能为空');
-		return false;
-	}
-	if(eNm == undefined || eNm == ''){
-		res.send('elementName 不能为空');
-		return false;
-	}
-	if(eType == undefined || eType == ''){
-		res.send('elementType 不能为空');
-		return false;
-	}
-	if(eFinder == undefined || eFinder == ''){
-		res.send('elementFinder 不能为空');
-		return false;
-	}
-	if(eValue == undefined || eValue == ''){
-		res.send('elementValue 不能为空');
-		return false;
-	}
-	if(eFrame == undefined || eFrame == ''){
-		res.send('elementFrame 不能为空');
-		return false;
-	}
-	/*if(eIndex == undefined || eIndex == ''){
-		res.send('elementIndex 不能为空');
-		return false;
-	}*/
-	
-	var updateElementSql ="update atp_element set " +
-					"(" +
-						"element_name=" + eNm +
-						"element_desc=" + eNm +
-						"element_type=" + eType +
-						"element_finder=" +  eFinder +
-						"element_value=" + eValue +
-						"element_frame=" + eFrame +
-						"element_index=" + eIndex +
-						"create_time=" + ctime +
-						"create_emp=" + cemp +
-						"delete_flag=" + deleteFlag
-					 ") where page_id=" + pgId
-	
-	var addElementSql="insert into atp_element" +
-					"(" +
-						"page_id, " + 
-						"element_name," + 
-						"element_desc," + 
-						"element_type," +
-						"element_finder," + 
-						"element_value," + 
-						"element_frame," + 
-						"element_index," +
-						"create_time," + 
-						"create_emp," + 
-						"delete_flag" +
-					")VALUES(" +
-						"'" + pgId + "'," + 
-						"'" + eNm + "'," + 
-						"'" + eNm + "'," + 
-						"'" + eType + "'," + 
-						"'" + eFinder + "'," + 
-						"'" + eValue + "'," + 
-						"'" + eFrame + "'," + 
-						"'" + eIndex + "'," + 
-						"" + ctime + "," + 
-						"'" + cemp + "'," + 
-						"'" + deleteFlag + "'"
-					+ ")"
-					
-	var execSql = "";
-	if(t =='add'){
-		execSql = addElementSql;
-	}else if(t =='update'){
-		execSql = updateElementSql;
-	}else{
-		res.send("{ result: 'fail', msg: 'type error' }");
-		return false;
-	}
-	console.log("sql="+execSql);
-
-	(async ()=>{
-		try {
-			//let results = await db.query2(execSql);
-			res.send("{ result: 'success', msg: 'add success' }");
-		}catch(e){
-			res.send("{ result: 'fail', msg: '" + e + "' }");
-		}
-	})();
-}
-
-
 
 //添加元素
+/*
 app.post('/element', urlencodedParser, function (req, res) {
 	console.log(req.body);//
 	addOneElment(req.body,res);
-})
-
+})*/
 
 
 app.use(bodyParser.json());
@@ -435,7 +343,6 @@ app.post('/elements', urlencodedParser, function (req, res) {
 
 
 app.use(express.static("web"));
-
 app.listen(port, ()=>{
 	try{
 		console.log("---------web服务启动成功-----------");
@@ -452,6 +359,13 @@ app.listen(port, ()=>{
 	}
 
 	console.log("-------启动成功, 请等待3秒后继续------");
-	
 
+
+});
+
+
+process.on('SIGINT', function () {
+	nodeCmd.run('taskkill /F /IM chromedriver.exe');
+    console.log("-------退出成功-------");
+    process.exit();
 });

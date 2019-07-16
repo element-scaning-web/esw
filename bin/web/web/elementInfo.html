@@ -638,7 +638,7 @@ $.extend($.fn.datagrid.methods, {
 				$("input[name='xp'][value='3']").click();
 			}
 			
-			if ($('input:radio[name=""]:checked').val() == null){
+			if ($('input:radio[name="xp"]:checked').val() == null){
 				$.messager.alert("提示消息", "请选择xpath", 'info');
 				return false;
 			}else{
@@ -1127,6 +1127,10 @@ $.extend($.fn.datagrid.methods, {
 
 		var rows = $('#newElements').datagrid('getRows');
 		for(var i=0; i<rows.length; i++){
+			if(isExistName(rows[i].element_name) == 1){
+				$.messager.alert("提示消息", "对象名称 " + rows[i].element_name + " 已存在，不能重复添加", 'info');
+				break;
+			}
 			$('#selectElements').datagrid('appendRow',rows[i]);
 			changeRows.push(rows[i]);
 		}
@@ -1140,8 +1144,13 @@ $.extend($.fn.datagrid.methods, {
 	function toLeftSelectAll(){
 		var rows = $('#selectElements').datagrid('getRows');
 		for(var i=0; i<rows.length; i++){
+			if(isExistName(rows[i].element_name) == 1){
+				$.messager.alert("提示消息", "对象名称 " + rows[i].element_name + " 已存在，不能重复添加", 'info');
+				break;
+			}
 			$('#newElements').datagrid('appendRow',rows[i]);
 		}
+		
 		refreshGrid('selectElements');
 		
 		$('#selectElements').datagrid('acceptChanges');
