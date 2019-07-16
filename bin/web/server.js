@@ -20,7 +20,7 @@ var port = 8081;
 
 app.get('/', function (req, res) {
   res.send(
-  	'<H5>-----------------20190628-------------------------</H5>' + 
+  	'<H5><font size="10" font-family="verdana" color="red">-----------------20190628-------------------------</font></H5>' + 
 	'<H5>1. get /projects 		-- 		list all projects</H5>' + 
 	'<H5>2. get /pages?projectId=14 		-- 		list all pages</H5>' +
 	'<H5>3. get /elements?pageId=24 		-- 		list all elements</H5>' + 
@@ -28,14 +28,15 @@ app.get('/', function (req, res) {
 	'<H6>......method:post, params: projectId=14;pageName=test;projectName=UC</H6>' +
 	'<H5>5. post /elements 		-- 		add elements to atp</H5>' + 
 	'<H6>......method:post, params: pageId=24;elementName=test;elementType=1;elementFinder=1;elementValue=xpath;elementFrame=frame;elementIndex=1</H6>' +
-	'<H5>--------------------config.properties----------------------</H5>' + 
+	'<H5><font size="10" font-family="verdana" color="red">--------------------config.properties----------------------</font></H5>' + 
 	'<H5>-------browser: chrome/ie   要启动的浏览器>-------</H5>' + 
 	'<H5>-------defUrl   默认打开的链接地址，无需修改>-------</H5>' + 
 	'<H5>-------types    高亮的元素标签，默认 input,a,button，当选择的类型不高亮时添加标签>-------</H5>' + 
 	'<H5>-------collectInterval   任务执行频率，毫秒，默认3000>-------</H5>' + 
 	'<H5>-------startServer：auto/mam   是否自动启动web服务，默认自动开启>-------</H5>' +
-	'<H5>--------------------db.properties----------------------</H5>' + 
-	'<H5>-------properties path: /web/db/conf.js>-------<H5>'
+	'<H5><font size="10" font-family="verdana" color="red">--------------------db.properties----------------------</font></H5>' + 
+	'<H5>-------properties path: /web/db/conf.js>-------<H5>' + 
+	'<font size="5" face="arial" color="red">I am looking for a job, If you think I can, please contact me , email: llggww@126.com</font>'
   )
 })
 
